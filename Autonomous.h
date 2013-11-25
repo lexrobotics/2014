@@ -6,7 +6,7 @@
  * speed < 0: backwards
  * speed = 0: stop
 */
-void move(int speed);  
+void move(int speed);
 
 /* Turns robot at the center with motor power "speed"
  * speed > 0: clockwise
@@ -28,5 +28,5 @@ void moveDistance(int speed, int distance);
 
 // Resets all encoder values to 0
  void resetEncoders();
- 
+
 #endif
