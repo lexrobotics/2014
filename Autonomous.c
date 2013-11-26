@@ -45,3 +45,7 @@ void resetEncoders() {
 	nMotorEncoder[motorsLeft] = 0;
 	nMotorEncoder[motorsRight] = 0;
 }
+
+int inchesToEncoder(int distance) {
+	 distance/CIRCUMFERENCE * ENCODER_SCALE;
+}
