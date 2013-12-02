@@ -5,7 +5,7 @@ const float ENCODER_SCALE = 1440.0; //number of encoder counts per rotation
 const float CIRCUMFERENCE = DIAMETER * PI;
 const float TURN_RADIUS = 0.0; //center of robot to turning circle in inches
 const float TURN_CIRCUMFERENCE = 2.0 * TURN_RADIUS * PI; //circumference of circle robot turns in
-
+const float
 void move(int speed) {
 	motor[motorsLeft] = speed;
 	motor[motorsRight] = speed;
