@@ -17,16 +17,16 @@ task main()
      	 nxtDisplayCenteredTextLine(2, "Red: %d", red);
      	 wait10Msec(10);
      	 */
-     	 /*
+
      	 SensorType[colorPort] = sensorCOLORBLUE;
      	 blue = SensorRaw[colorPort];
      	 nxtDisplayCenteredTextLine(3, "Blue: %d", blue);
      	 wait10Msec(10);
-     	 */
-     	 SensorType[colorPort] = sensorCOLORGREEN;
-     	 blue = SensorRaw[colorPort];
+
+     	/*? SensorType[colorPort] = sensorCOLORGREEN;
+     	 green = SensorRaw[colorPort];
      	 nxtDisplayCenteredTextLine(4, "Green: %d", green);
      	 wait10Msec(10);
-
+*/
    }
 }
