@@ -23,18 +23,17 @@ task main()
 
 	int deg,value;
 
-	int speed=10;
+	int speed=20;
 	nMotorEncoder[sonarMotor]=0;
 	motor[sonarMotor]=speed;
 
 	while(1){
 		deg=nMotorEncoder[sonarMotor];
-		if(deg>360){motor[sonarMotor]=-speed;eraseDisplay();}
-		if(deg<0){motor[sonarMotor]=speed;eraseDisplay();}
+		if(deg>360){motor[sonarMotor]=-speed;/*eraseDisplay();*/}
+		if(deg<0){motor[sonarMotor]=speed;/*eraseDisplay();*/}
 
 		value=SensorValue[sonarSensor];
-		if(value<100&&value>20)plotPoint(cosDegrees(deg)*(value), sinDegrees(deg)*(value));
-		wait1Msec(5);
+		/*if(value<100&&value>20)*/plotPoint(cosDegrees(deg)*(value), sinDegrees(deg)*(value));
 
 
 		/*
@@ -63,7 +62,7 @@ void plotPoint(int nx, int ny) {
 	float x = (float) nx;
 	float y = (float) ny;
 
-	float UpperBounds=255;//this much in each direction x+ x- y+ y-
+	float UpperBounds=40;//this much in each direction x+ x- y+ y-
 
 	writeDebugStream("(%d,%d),",(int)x,(int)y);
 
