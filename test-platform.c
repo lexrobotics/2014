@@ -1,5 +1,4 @@
 #pragma config(Hubs,  S1, HTServo,  HTMotor,  none,     none)
-#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Motor,  mtr_S1_C2_1,     motor1,        tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_2,     motor2,        tmotorTetrix, openLoop)
 #pragma config(Servo,  srvo_S1_C1_1,    stdServo1,            tServoStandard)
@@ -23,9 +22,9 @@ void servoTest() {
 		else if(nNxtButtonPressed == 0)  //exit button
 			return;
 
-		servo[servo1] = pos;
-		servo[servo2] = pos;
-		servo[servo3] = pos;
+		servo[stdServo1] = pos;
+		servo[stdServo2] = pos;
+		servo[stdServo3] = pos;
 		wait1Msec(5);
 	}
 }
