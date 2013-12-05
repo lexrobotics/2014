@@ -14,7 +14,7 @@ void move(int speed) {
 
 void turn(int speed) {
 	motor[motorsLeft] = speed;
-	motor[motorsRight] = -1*speed;
+	motor[motorsRight] = -1 * speed;
 }
 
 void moveDistance(int speed, int distance) {
@@ -39,6 +39,10 @@ void turnDistance(int speed, int angle) {
 		&& abs(nMotorEncoder[motorsRight]) < abs(target));
 
 	turn(0); //speed
+}
+
+void pause(float seconds) {
+	wait1Msec(seconds * 1000);
 }
 
 void resetEncoders() {

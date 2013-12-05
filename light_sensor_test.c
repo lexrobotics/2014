@@ -8,7 +8,8 @@ task main()
 	eraseDisplay();
 
 	while(true) {
-		nxtDisplayCenteredTextLine(3, "Light Value: %d", SensorValue[LIGHTS3]);
+		nxtDisplayCenteredTextLine(3, "Left Light: %d", SensorValue[LIGHTS3]);
+		nxtDisplayCenteredTextLine(4, "Right Light: %d", SensorValue[LIGHTS4]);
 		wait1Msec(100);
 	}
 }

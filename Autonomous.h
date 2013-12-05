@@ -26,6 +26,9 @@ void moveDistance(int speed, int distance);
 */
  void turnDistance(int speed, int angle);
 
+// Wait a number of seconds
+ void pause(float seconds);
+
 // Resets all encoder values to 0
  void resetEncoders();
 
