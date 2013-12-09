@@ -41,6 +41,7 @@ void initAutonomous()
 	//nMotorPIDSpeedCtrl[motorsLeft] = mtrSpeedReg;
 	//nMotorPIDSpeedCtrl[motorRightFront] = mtrSpeedReg;
 	//nMotorPIDSpeedCtrl[motorRightBack] = mtrSpeedReg;
+	servo[harvestLifter] = 127;
 }
 
 void turn(float speed)

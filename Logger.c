@@ -55,7 +55,7 @@ task Logger() {
 			log_written++;
 		}
 	}
-	WriteDebugStream("Closing file");
+
 	Close(file, result);
 	StopTask(Logger);
 }
