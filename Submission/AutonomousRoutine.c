@@ -1,8 +1,7 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTServo)
-#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
-#pragma config(Sensor, S2,     HTIRS2,         sensorI2CCustom)
-#pragma config(Sensor, S3,     HTSMUX,         sensorI2CCustom)
-#pragma config(Sensor, S4,     HTSPB,          sensorI2CCustom9V)
+#pragma config(Sensor, S2,     HTSMUX,               sensorI2CMuxController)
+#pragma config(Sensor, S3,     ,           sensorAnalogInactive)
+#pragma config(Sensor, S4,     sonarSensor,    sensorSONAR)
 #pragma config(Motor,  motorA,          gun,           tmotorNXT, PIDControl, encoder)
 #pragma config(Motor,  mtr_S1_C1_1,     motorsRight,   tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C1_2,     motorsLeft,    tmotorTetrix, openLoop)
@@ -66,10 +65,10 @@ task main() {
 	}
 	else {
 		if(!reverseOntoRamp) {
-			reverseEndOfRamp(currentPos):
+			reverseEndOfRamp(currentPos);
 		}
 		else {
-			reverseBeginningOfRamp(currentPos):
+			reverseBeginningOfRamp(currentPos);
 		}
 	}
 

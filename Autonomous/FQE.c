@@ -1,4 +1,5 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTServo)
+#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Sensor, S2,     HTSMUX,         sensorI2CCustom)
 #pragma config(Sensor, S3,     gyro,           sensorI2CCustom)
 #pragma config(Sensor, S4,     HTSPB,          sensorI2CCustom9V)
@@ -35,12 +36,12 @@ task main() {
     bool reverseOntoRamp = selectBool("Approach ramp", "Beginning", "End");
     bool reverse = selectBool("Should reverse", "Reverse", "Forwards");
     */
-    bool queue = 0,
-    	reverseOntoRamp = 0,
-    	reverseStart = 0;
+    bool queue = true;
+    bool	reverseOntoRamp = false;
+    bool	reverseStart = false;
 
 	initAutonomous(); //call initialization function
-	//waitForStart();	//wait for start from FCS
+	waitForStart();	//wait for start from FCS
 	pause(initDelay);
 
 	if(reverseStart) {

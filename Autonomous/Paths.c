@@ -13,23 +13,13 @@ static int REVERSE_MOTOR_SPEED_MAX = -1*BASE_MOTOR_SPEED_MAX;
 
 void shoot()
 {
-	pause(SHORT_WAIT);
+	move(0);
+	pause(LONG_WAIT);
 
-	//shoot block
 	motor[gun] = -100;
 
-	//Do not change the value below
-	//It is an ancient and powerful value naturally imbued with DARK MAGIC
-	//The one who changes it will be bestowed with a curse upon
-	//Thee and your family
-	//Dooming them to being smited by supernatural forces
-	//(It seriously won't work if you change it so please don't)
-
+	//DARK MAGIC do not change from 0.1. Seriously.
 	pause (0.1);
-	/*
-	DO NOT CHANGE ABOVE ARGUMENT!!
-	MUST BE 0.1!!
-	*/
 
 	motor[gun] = 0;
 }//end function shoot
@@ -49,25 +39,24 @@ void reverseLineUp() {
 }
 
 void forwardQueue() {
-	moveDistance(MOTOR_SPEED_SLOW, 5);
+	moveDistance(MOTOR_SPEED_SLOW, 3);
 	pause(SHORT_WAIT);
 	turnWithGyro(-1*MOTOR_SPEED, 90);
 	pause(SHORT_WAIT);
 	moveDistance(MOTOR_SPEED_SLOW, 25);
 	pause(SHORT_WAIT);
-	turnWithGyro(MOTOR_SPEED, 38);
+	turnWithGyro(MOTOR_SPEED, 45);
 }
 
 void reverseQueue() {
-	moveDistance(MOTOR_SPEED_SLOW, 5);
+	moveDistance(REVERSE_MOTOR_SPEED, 3);
 	pause(SHORT_WAIT);
-	turnWithGyro(-1*MOTOR_SPEED, 90);
+	turnWithGyro(MOTOR_SPEED, 90);
 	pause(SHORT_WAIT);
-	moveDistance(MOTOR_SPEED_SLOW, 34);
+	moveDistance(REVERSE_MOTOR_SPEED, 34);
 	pause(SHORT_WAIT);
-	turnWithGyro(MOTOR_SPEED, 42);
-	pause(SHORT_WAIT);
-	moveDistance(-1*MOTOR_SPEED, 2);
+	turnWithGyro(REVERSE_MOTOR_SPEED, 43);
+	moveDistance(MOTOR_SPEED_SLOW, 3);
 }
 
 /*
@@ -117,7 +106,7 @@ int reverseDriveUp() {
 	}
 	else {
 		//behind center
-		moveDistance(REVERSE_MOTOR_SPEED_SLOW, 5);
+		moveDistance(REVERSE_MOTOR_SPEED_SLOW, 6);
 	}
 	shoot();
 	return stopPos + nMotorEncoder[motorsRight];
@@ -146,6 +135,10 @@ void endOfRamp(int currentPos)
 //	}
 }//end of function endOfRamp
 
+/*
+	Starts: At IR basket, along tape (at currentPos encoder counts) (rear of robot facing forwards)
+	Stops: End of ramp
+*/
 void reverseEndOfRamp(int currentPos) {
 		//drive to end of ramp
 	resetEncoders();
@@ -164,53 +157,44 @@ void reverseEndOfRamp(int currentPos) {
 }
 
 void beginningOfRamp(int currentPos) {
+	int rev=1;
+
 	resetEncoders();
 	pause(SHORT_WAIT);
-	move(-1*MOTOR_SPEED);
-	while(abs(nMotorEncoder[motorsRight] + currentPos) > inchesToEncoder(5))
+	move(-rev*MOTOR_SPEED);
+	while(rev*(nMotorEncoder[motorsRight] + currentPos) > inchesToEncoder(15))
 		;
 	move(0);
 }
 
 void reverseBeginningOfRamp(int currentPos) {
+	int rev=-1;
+
 	resetEncoders();
 	pause(SHORT_WAIT);
-	move(MOTOR_SPEED);
-	writeDebugStreamLine("%d+%d/%d", nMotorEncoder[motorsRight], currentPos, inchesToEncoder(5));
-	while(nMotorEncoder[motorsRight] + currentPos < -1*inchesToEncoder(5))
+	move(-rev*MOTOR_SPEED);
+	while(rev*(nMotorEncoder[motorsRight] + currentPos) > inchesToEncoder(5))
 		;
 	move(0);
 }
 
-void forwardRamp()
-{
+void ramp(int rev){
 	//line up with ramp
 	resetEncoders();
 	pause(SHORT_WAIT);
-	turnWithGyro(MOTOR_SPEED, 40);
-	moveDistance(MOTOR_SPEED, 12);
+	turnWithGyro(rev*MOTOR_SPEED, 40, false);
+	moveDistance(rev*MOTOR_SPEED, 12);
 	pause(SHORT_WAIT);
-	turnWithGyro(MOTOR_SPEED, 40);
-	moveDistance(MOTOR_SPEED_MAX, 30);
-}//end of forwardRamp
+	turnWithGyro(rev*MOTOR_SPEED, 30, false);//NOTE for original: in forwardRamp it's 40, in reverseRamp it's 30. --should not matter a whole lot--
+	moveDistance(rev*MOTOR_SPEED_MAX, 30);
+}
+void forwardRamp(){ramp(1);}
+void reverseRamp(){ramp(-1);}
 
-void reverseRamp()
-{
-	//line up with ramp
-	resetEncoders();
-	pause(SHORT_WAIT);
-	turnWithGyro(-1*MOTOR_SPEED, 40);
-	moveDistance(-1*MOTOR_SPEED, 12);
-	pause(SHORT_WAIT);
-	turnWithGyro(-1*MOTOR_SPEED, 30);
-	moveDistance(-1*MOTOR_SPEED_MAX, 30);
-}//end of reverseRamp
-
-void turnAndPark()
-{
+void turnAndPark(){
 	//turn and park
 	resetEncoders();
 	pause(SHORT_WAIT);
-	turnWithGyro(-50, 85);
-	moveDistance(-100, 40);
+	turnWithGyro(REVERSE_MOTOR_SPEED, 85, false);
+	moveDistance(REVERSE_MOTOR_SPEED_MAX, 50);
 }//end of turnAndPark

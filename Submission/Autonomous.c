@@ -1,9 +1,9 @@
-#include "Autonomous.h"
+//#include "Autonomous.h"
 #include "drivers/hitechnic-irseeker-v2.h"
 #include "drivers/hitechnic-sensormux.h"
 #include "drivers/hitechnic-gyro.h"
 
-const tMUXSensor gyro = msensor_S3_1;
+const tMUXSensor HTIRS2 = msensor_S1_1;
 
 /* Autonomous.c:
    Contains abstraction functions for low-level control of hardware
@@ -53,7 +53,7 @@ void moveDistance(int speed, int distance);
  * Works like turn(), except stops when robot reaches angle degrees
  * Degrees is always positive, speed determines direction of rotation
  */
- void turnDistance(int speed, int angle);
+ //void turnDistance(int speed, int angle);
 
 /* Turns robot a certain angle
  * Works like turnDistance()
@@ -65,7 +65,7 @@ void moveDistance(int speed, int distance);
  void pause(float seconds);
 
 // Menu that displays question on screen, gets boolean answer of either two options
- bool selectBoolean(string question, string option1, string option2);
+ bool selectBoolean(char* question, char* option1, char* option2);
 
  // Menu that allows user to select an integer delay for beginning of autonomous
 int selectDelay();
@@ -147,7 +147,7 @@ task getHeading () {
 	//float prevHeading = 0;
 	float curRate = 0;
 	nSchedulePriority = kHighPriority;
-  HTGYROstartCal(gyro);
+  HTGYROstartCal(gyro);//Gyro cannot be mux'd.
   pause(1);
   PlaySound(soundBeepBeep);
   while (true) {
