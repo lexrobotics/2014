@@ -1,11 +1,11 @@
 #include "Autonomous.h"
 #include "drivers/hitechnic-irseeker-v2.h"
-#include "drivers/hitechnic-gyro.h"
 #include "drivers/hitechnic-sensormux.h"
+#include "drivers/hitechnic-gyro.h"
 
 const tMUXSensor gyro = msensor_S3_1;
 
-/* Autonomous.c: 
+/* Autonomous.c:
    Contains abstraction functions for low-level control of hardware
    such as motors, sensors, etc
 */
@@ -190,7 +190,7 @@ void pause(float seconds) {
 	wait1Msec(seconds * 1000);
 }
 
-bool selectBoolean(string question, string option1, string option2) {
+bool selectBoolean(char* question, char* option1, char* option2) {
 	bool selection = false;
 	ClearTimer(T1);
 	while(true) {

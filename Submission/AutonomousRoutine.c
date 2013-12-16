@@ -31,11 +31,11 @@ task main() {
 
     int initDelay = selectDelay();
     bool queue = selectBoolean("Should queue", "Queue", "Align");
-    bool reverseOntoRamp = selectBoolean("Approach ramp" "Beginning", "End");
+    bool reverseOntoRamp = selectBoolean("Approach ramp", "Beginning", "End");
     bool reverse = selectBoolean("Should reverse", "Reverse", "Forwards");
 
 	initAutonomous(); //call initialization function
-	waitForStart();	//wait for start from FCS 
+	waitForStart();	//wait for start from FCS
 	pause(initDelay);
 
 	if(reverse) {
@@ -73,7 +73,7 @@ task main() {
 		}
 	}
 
-	if((!reverse && !reverseOntoRamp) || (reverse && reverseQueue)) {
+	if((!reverse && !reverseOntoRamp) || (reverse && reverseOntoRamp)) {
 		forwardRamp();
 		turnAndPark();
 	}
