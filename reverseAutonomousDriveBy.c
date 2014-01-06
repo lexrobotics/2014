@@ -21,9 +21,11 @@
 #include "line_Tracking.c"
 //#include "CollisionDetection.c"
 #include "drivers/hitechnic-irseeker-v2.h"
+#include "drivers/hitechnic-sensormux.h"
+#include "drivers/lego-light.h"
 
-static int motorSpeed = 50;
-static int motorSpeedSlow = 25;
+static int motorSpeed = -50;
+static int motorSpeedSlow = -25;
 static int centerDist = 40;
 static int rampDist = 80;
 
@@ -44,14 +46,14 @@ task main() {
 	servo[gun] = 255;
 
 	if(shouldQueue) {
-		turnDistance(motorSpeed, 40);
-		moveDistance(motorSpeedSlow, 15);
-		turnDistance(-1*motorSpeed, 50);
+		turnDistance(motorSpeed, 45);
+		moveDistance(motorSpeedSlow, 30);
+		turnDistance(-1*motorSpeed, 55);
 	}
 
 	bool scanning = true;
 	move(motorSpeedSlow);
-	while(sector!= 5 && nMotorEncoder[motorsRight] < inchesToEncoder(65)) {
+	while(sector!= 5 && abs(nMotorEncoder[motorsRight]) < inchesToEncoder(65)) {
 		sector = HTIRS2readACDir(HTIRS2);
 	}
 	/*
@@ -69,13 +71,13 @@ task main() {
 	pause(0.1);
 	int currentPos = nMotorEncoder[motorsRight];
 
-	if(inchesToEncoder(35) < nMotorEncoder[motorsRight]) {
+	if(inchesToEncoder(35) < abs(nMotorEncoder[motorsRight])) {
 	  addToLog("IR second half");
-		moveDistance(motorSpeedSlow, 7);
+		moveDistance(motorSpeedSlow, 8);
 	}
 	else {
 	  addToLog("IR first half");
-		moveDistance(motorSpeedSlow, 9);
+		moveDistance(motorSpeedSlow, 7);
 	}
 	pause(0.1);
 	move(0);
@@ -84,27 +86,27 @@ task main() {
 	pause(0.5);
 	servo[gun] = 255;
   addToLogWithTime("Shot gun");
-	while(nMotorEncoder[motorsRight] + currentPos < inchesToEncoder(68)) {
+	while(abs(nMotorEncoder[motorsRight] + currentPos) < inchesToEncoder(73)) {
 		move(motorSpeed);
   }
   move(0);
-
+	//while(true);
   addToLogWithTime("Past baskets");
 
 	pause(0.1);
-	turnDistance(motorSpeed, 110);
+	turnDistance(-1 * motorSpeed, 80);
 	lightsCameraAction();
 
 	if(secondLine) {
 		while(LSvalNorm(RLIGHT)<lightValue){
 			move(-50);
 		}
-		turnDistance(-50, 20);
+		turnDistance(50, 20);
 		moveDistance(-50, 10);
 	}
-	lineUp();
+	reverseLineUp();
 	resetEncoders();
-	int prevEncoder = 0;
+  int prevEncoder = 0;
  	do {
  		prevEncoder = nMotorEncoder[motorsRight];
 		move(-50);
@@ -115,8 +117,11 @@ task main() {
 	move(0);
 
 	/*
-	moveDistance(-1*motorSpeed, 40);
-	turnDistance(-1*motorSpeed, 90);
+	moveDistance(motorSpeed, 40);
+	turnDistance(-1*motorSpeed, 100);
+	moveDistance(-100, 40);
+	*/
+	/*
 	resetEncoders();
 	move(-100);
 	pause(0.5);
@@ -129,7 +134,6 @@ task main() {
 	servo[harvestLifter] = 0;
 	pause(6.5);
 	servo[harvestLifter] = 127;
-
 
 	addToLogWithTime("Dropping lifter");
 	pause(2);
