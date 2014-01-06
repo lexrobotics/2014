@@ -30,9 +30,10 @@ static int rampDist = 80;
 task main() {
 	int initDelay = selectDelay();
 	bool shouldQueue = selectQueue();
-	bool secondLine = selectLine();
-	//waitForStart();
+	bool shouldTakeSecondLine = selectLine();
+	waitForStart();
 	//ClearTimer(T2);
+	//StartTask(dropHarvester);
 	pause(initDelay);
 	StartTask(Logger);
 
@@ -46,8 +47,9 @@ task main() {
 	if(shouldQueue) {
 		turnDistance(motorSpeed, 40);
 		moveDistance(motorSpeedSlow, 15);
-		turnDistance(-1*motorSpeed, 50);
+		turnDistance(-1*motorSpeed, 55);
 	}
+	resetEncoders();
 
 	bool scanning = true;
 	move(motorSpeedSlow);
@@ -71,11 +73,11 @@ task main() {
 
 	if(inchesToEncoder(35) < nMotorEncoder[motorsRight]) {
 	  addToLog("IR second half");
-		moveDistance(motorSpeedSlow, 7);
+		moveDistance(motorSpeedSlow, 6);
 	}
 	else {
 	  addToLog("IR first half");
-		moveDistance(motorSpeedSlow, 9);
+		moveDistance(motorSpeedSlow, 8);
 	}
 	pause(0.1);
 	move(0);
@@ -83,8 +85,10 @@ task main() {
 	servo[gun] = 0;
 	pause(0.5);
 	servo[gun] = 255;
+	pause(0.5);
   addToLogWithTime("Shot gun");
-	while(nMotorEncoder[motorsRight] + currentPos < inchesToEncoder(68)) {
+
+  while(nMotorEncoder[motorsRight] + currentPos < inchesToEncoder(68)) {
 		move(motorSpeed);
   }
   move(0);
@@ -95,14 +99,14 @@ task main() {
 	turnDistance(motorSpeed, 110);
 	lightsCameraAction();
 
-	if(secondLine) {
+	if(shouldTakeSecondLine) {
 		while(LSvalNorm(RLIGHT)<lightValue){
 			move(-50);
 		}
 		turnDistance(-50, 20);
 		moveDistance(-50, 10);
 	}
-	lineUp();
+	lineUp(false);
 	resetEncoders();
 	int prevEncoder = 0;
  	do {
@@ -127,7 +131,7 @@ task main() {
 	*/
 
 	servo[harvestLifter] = 0;
-	pause(6.5);
+	pause(8);
 	servo[harvestLifter] = 127;
 
 

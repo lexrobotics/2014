@@ -1,5 +1,6 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTServo)
-#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
+#pragma config(Sensor, S2,     HTIRS2,         sensorI2CCustom)
+#pragma config(Sensor, S3,		 HTSMUX,				 sensorI2CCustom)
 #pragma config(Motor,  mtr_S1_C1_1,     motorsRight,   tmotorTetrix, openLoop, encoder)
 #pragma config(Motor,  mtr_S1_C1_2,     pulleyMotor,   tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_1,     flagMotor,     tmotorTetrix, openLoop)
@@ -48,9 +49,9 @@ task arm() {
 		else
 			servo[harvestLifter] = 127;
 
-		if(joy1Btn(6))//if right front trigger is pressed, harvestMotor is powered, harvesting blocks with the roller thing in the front.
+		if(joy1Btn(6) && joy2Btn(3))//if right front trigger is pressed, harvestMotor is powered, harvesting blocks with the roller thing in the front.
 			motor[harvestMotor] = 100; //out
-		else if(joy1Btn(8))
+		else if(joy1Btn(8)&& joy2Btn(3))
 			motor[harvestMotor] = -100; //in
 		else
 			motor[harvestMotor] = 0;
@@ -156,7 +157,13 @@ task main() {
 			powerLeft = MOTOR_SCALE*joystick.joy1_y1;
 		//}
 
-		motor[motorsRight] = powerRight;
-		motor[motorsLeft] = powerLeft;
+		if(joy2Btn(3)) {
+			motor[motorsRight] = powerRight;
+			motor[motorsLeft] = powerLeft;
+		}
+		else {
+			motor[motorsRight] = 0;
+			motor[motorsLeft] = 0;
+		}
 	}
 }

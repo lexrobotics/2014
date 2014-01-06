@@ -1,3 +1,4 @@
+#include "drivers/hitechnic-sensormux.h"
 #include "drivers/hitechnic-accelerometer.h"
 
 int size(int *arr) {
@@ -7,7 +8,7 @@ int size(int *arr) {
 int TIME_THRESH = 4;
 const int ARRAY_SIZE = 25;
 int THRESH = 15;
-
+//const tMUXSensor HTAC = msensor_S3_3;
 bool stationary=false;
 
 void addData(int n, int *data) {

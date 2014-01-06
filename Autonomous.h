@@ -1,6 +1,17 @@
 #ifndef HEADERFILE_H
 #define HEADERFILE_H
 
+/* Sets mode for IR sensor
+ * Sets initial position of harvester
+*/
+void initAutonomous();
+
+// Converts inches to target value for encoder
+int inchesToEncoder(int distance);
+
+// Converts degrees to target value for encoder
+int degreesToEncoder(int angle);
+
 /* Moves robot with motor power "speed"
  * speed > 0: forward
  * speed < 0: backwards
