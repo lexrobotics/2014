@@ -1,13 +1,14 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTServo)
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
+#pragma config(Motor,  motorA,          gun,           tmotorNXT, PIDControl, encoder)
 #pragma config(Motor,  mtr_S1_C1_1,     dualWheels,    tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C1_2,     motorsRight,   tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C2_1,     motorsLeft,    tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_2,     Lift1,         tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C3_1,     Lift2,         tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C3_2,     motorI,        tmotorTetrix, openLoop)
-#pragma config(Servo,  srvo_S1_C4_1,    servo1,               tServoNone)
-#pragma config(Servo,  srvo_S1_C4_2,    servo2,               tServoNone)
+#pragma config(Servo,  srvo_S1_C4_1,    ramp,                 tServoStandard)
+#pragma config(Servo,  srvo_S1_C4_2,    singleWheel,          tServoContinuousRotation)
 #pragma config(Servo,  srvo_S1_C4_3,    servo3,               tServoNone)
 #pragma config(Servo,  srvo_S1_C4_4,    servo4,               tServoNone)
 #pragma config(Servo,  srvo_S1_C4_5,    servo5,               tServoNone)
@@ -34,18 +35,22 @@ task arm() {
 	while(true){
 		getJoystickSettings(joystick); //grab snapshot of controller positions
 
-		if(joy1Btn(6)){					//pressing right triggers control the dual wheels, sucking in or shooting out blocks
-		motor[dualWheels] = -100;
+		if(joy1Btn(6)){					//pressing right and left triggers  of controler1 control the dual wheels and single wheel at full power,
+		motor[dualWheels] = -60;//sucking in or shooting out blocks
+		servo[singleWheel]  = 30;
 		}
 		else if(joy1Btn(8)){
 		motor[dualWheels] = 0;
+		servo[singleWheel] = 127;
 		}
 
 		if(joy1Btn(5)){
-		motor[dualWheels] = 100;
+		motor[dualWheels] = 60;
+		servo[singleWheel] = 240;
 		}
 		else if(joy1Btn(7)){
 		motor[dualWheels] = 0;
+		servo[singleWheel] = 127;
 		}
 
 		if(joy1Btn(4)){					//pressing number buttons activate lifts. 4 and 2 control lift1, while 1 and 3 control lift2.
@@ -66,6 +71,36 @@ task arm() {
 		}
 		else{
 		motor[Lift2] = 0;
+		}
+
+		if(joy2Btn(1)){//  gun
+		motor[gun] = 100;
+		}
+		else if(joy2Btn(3)){
+		motor[gun] = - 100;
+		}
+		else{
+		motor[gun]  = 0;
+		}
+
+		if(joy2Btn(2)){//controls ramp angle
+			servo[ramp] = servo[ramp] - 10;
+		}
+		else if(joy2Btn(4)){
+			servo[ramp] = servo[ramp] + 10;
+		}
+
+		if(joy2Btn(6)){//right and left triggers on controler2 controls singleWheel and dual wheel with less power,
+			motor[dualWheels] = 80;//which suck in or spit out blocks
+			servo[singleWheel] = 180;
+		}
+		else if(joy2Btn(5)){
+			motor[dualWheels] = -80;
+			servo[singleWheel] = 70;
+		}
+		else if(joy2Btn(8)){
+			motor[dualWheels] = 0;
+			servo[singleWheel] = 127;
 		}
 
 	}

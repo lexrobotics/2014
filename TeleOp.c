@@ -155,8 +155,13 @@ task main() {
 			powerRight = MOTOR_SCALE*joystick.joy1_y2;
 			powerLeft = MOTOR_SCALE*joystick.joy1_y1;
 		//}
-
-		motor[motorsRight] = powerRight;
-		motor[motorsLeft] = powerLeft;
+		if(joy2Btn(1)) {
+			motor[motorsRight] = powerRight;
+			motor[motorsLeft] = powerLeft;
+		}
+		else {
+			motor[motorsRight] = 0;
+			motor[motorsLeft] = 0;
+		}
 	}
 }

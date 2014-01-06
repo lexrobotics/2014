@@ -6,4 +6,5 @@ task main()
 	motor[a] = 100;
 	wait1Msec(1000);
 	motor[a] = -100;
+	wait1Msec(1000);
 }
