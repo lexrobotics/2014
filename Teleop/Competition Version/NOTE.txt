@@ -1,0 +1,5 @@
+Make a *copy* of a working version (and all includes) into this folder.
+NO other versions should be here than the competition one.
+Do not edit any of these directly.
+
+This version is GUARANTEED to work. It may not be fully-featured or anything, but it MUST work before you paste it here.
