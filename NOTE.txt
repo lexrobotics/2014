@@ -1,0 +1,5 @@
+Keep autonomous things in Autonomous folder.
+Keep teleop things in Teleop folder.
+Moved 1/9/2014, I may have broken stuff.
+
+-Clive :P
