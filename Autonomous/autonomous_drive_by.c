@@ -49,7 +49,7 @@ task main() {
 		turnDistance(-1*motorSpeed, 50);
 	}
 
-	bool scanning = true;
+	bool scanning = true;{
 	move(motorSpeedSlow);
 	while(sector!= 5 && nMotorEncoder[motorsRight] < inchesToEncoder(65)) {
 		sector = HTIRS2readACDir(HTIRS2);
@@ -102,7 +102,7 @@ task main() {
 		turnDistance(-50, 20);
 		moveDistance(-50, 10);
 	}
-	lineUp();
+	lineUp();{
 	resetEncoders();
 	int prevEncoder = 0;
  	do {

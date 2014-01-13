@@ -5,9 +5,9 @@
 const float DIAMETER = 4.0; //diameter of wheel in inches
 const float ENCODER_SCALE = 1440.0; //number of encoder counts per rotation
 const float CIRCUMFERENCE = DIAMETER * PI;
-const float TURN_RADIUS = 6.0; //center of robot to turning circle in inches
+const float TURN_RADIUS = 11.02; //center of robot to turning circle in inches
 const float TURN_CIRCUMFERENCE = 2.0 * TURN_RADIUS * PI; //circumference of circle robot turns in
-const float TURN_SCALAR = 1.8; //because it's not a square
+const float TURN_SCALAR = 1.2; //because it's not a square
 
 void initAutonomous()
 {
@@ -16,7 +16,6 @@ void initAutonomous()
 	  nMotorPIDSpeedCtrl[motorsLeft] = mtrSpeedReg;
 	  nMotorPIDSpeedCtrl[motorRightFront] = mtrSpeedReg;
 	  nMotorPIDSpeedCtrl[motorRightBack] = mtrSpeedReg;*/
-	servo[harvestLifter] = 127;
 }
 
 int inchesToEncoder(int distance) {
@@ -147,11 +146,4 @@ int selectDelay() {
 void resetEncoders() {
 	nMotorEncoder[motorsLeft] = 0;
 	nMotorEncoder[motorsRight] = 0;
-}
-
-task dropHarvester() {
-	pause(20);
-	servo[harvestLifter] = 0;
-	pause(8.5);
-	servo[harvestLifter] = 127;
 }

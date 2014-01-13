@@ -20,14 +20,14 @@
 #include "drivers/hitechnic-sensormux.h"
 #include "drivers/lego-light.h"
 
-const tMUXSensor RLIGHT = msensor_S3_2;
-const tMUXSensor LLIGHT = msensor_S3_1;
+const tMUXSensor RLIGHT = msensor_S3_3;
+const tMUXSensor LLIGHT = msensor_S3_4;
 
 task main() {
 	LSsetActive(RLIGHT);
 	LSsetActive(LLIGHT);
 	pause(1);
 	while(true) {
-		nxtDisplayCenteredTextLine(3, "%d, %d",LSvalRaw(LLIGHT), LSvalRaw(RLIGHT));
+		nxtDisplayCenteredTextLine(3, "%d, %d",LSvalNorm(LLIGHT), LSvalNorm(RLIGHT));
 	}
 }
