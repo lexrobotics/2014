@@ -3,22 +3,22 @@
 #include "drivers/hitechnic-sensormux.h"
 #include "drivers/lego-light.h"
 
-const tMUXSensor RLIGHT = msensor_S3_2;
-const tMUXSensor LLIGHT = msensor_S3_1;
+const tMUXSensor RLIGHT = msensor_S3_3;
+const tMUXSensor LLIGHT = msensor_S3_4;
 
 static int lineSpeed = -30;
 static int turnSpeed = -60;
-static int lightValue = 50;
+static int lightValue = 45 ;
 short leftLight, rightLight, leftLightPrev, rightLightPrev;
 
 void driftLeft(int speed) {
-	motor[motorsLeft] = -50;
-	motor[motorsRight] = -10;
+	motor[motorsLeft] = 30;
+	motor[motorsRight] = -50;
 }
 
 void driftRight(int speed) {
-	motor[motorsLeft] = -10;
-	motor[motorsRight] = -50;
+	motor[motorsLeft] = -50;
+	motor[motorsRight] = 30;
 }
 
 void lightsCameraAction() {
@@ -30,7 +30,7 @@ void lightsCameraAction() {
 void lineFollow() {
 	int lineTarget = inchesToEncoder(60);
 	resetEncoders();
-	while(abs(nMotorEncoder[motorsLeft]) < abs(lineTarget)
+	/*while(abs(nMotorEncoder[motorsLeft]) < abs(lineTarget)
 		&& abs(nMotorEncoder[motorsRight]) < abs(lineTarget)) {
 		leftLight = LSvalNorm(LLIGHT);
 		leftLightPrev = leftLight;
@@ -46,6 +46,15 @@ void lineFollow() {
 			rightLightPrev = rightLight;
 			rightLight = LSvalNorm(RLIGHT);
 		}
+	}*/
+	int rightLight = LSvalNorm(RLIGHT);
+	while(rightLight < lightValue) {
+			rightLight = LSvalNorm(RLIGHT);
+			driftLeft(50);
+	}
+	while(leftLight < lightValue) {
+			leftLight = LSvalNorm(LLIGHT);
+			driftRight(50);
 	}
 }
 
@@ -99,7 +108,7 @@ void lineUp(bool secondLine) {
 	lightsCameraAction();
 	findLine(1);
 	alignLine(1);
-	lineFollow();
+	//lineFollow();
 }
 
 void reverseLineUp(bool secondLine) {
