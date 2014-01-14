@@ -19,7 +19,7 @@
 
 #include "JoystickDriver.c"
 #include "Autonomous.c"
-//#include "line_Tracking.c"
+#include "line_Tracking.c"
 //#include "CollisionDetection.c"
 #include "drivers/hitechnic-irseeker-v2.h"
 
@@ -32,7 +32,7 @@ task main() {
 	int initDelay = selectDelay();
 	bool shouldQueue = selectQueue();
 	bool shouldTakeSecondLine = selectLine();
-	waitForStart();
+	//waitForStart();
 	//ClearTimer(T2);
 	//StartTask(dropHarvester);
 	pause(initDelay);
@@ -44,9 +44,9 @@ task main() {
 	resetEncoders();
 
 	if(shouldQueue) {
+		turnDistance(-1*motorSpeed, 35);
+		moveDistance(motorSpeedSlow, 30);
 		turnDistance(motorSpeed, 40);
-		moveDistance(motorSpeedSlow, 15);
-		turnDistance(-1*motorSpeed, 55);
 	}
 	resetEncoders();
 
@@ -62,17 +62,16 @@ task main() {
 		else
 			scanning = false;
 	}*/
-
 	move(0);
 	pause(0.1);
 	int currentPos = nMotorEncoder[motorsRight];
 
-/*	if(inchesToEncoder(35) < nMotorEncoder[motorsRight]) {
-		moveDistance(motorSpeedSlow, 6);
+	if(inchesToEncoder(35) < nMotorEncoder[motorsRight]) {
+		//moveDistance(motorSpeedSlow, 6);
 	}
 	else {
-		moveDistance(motorSpeedSlow, 8);
-	}*/
+		moveDistance(motorSpeedSlow, 6);
+	}
 //	pause(0.1);
 	//move(0);
 
@@ -81,8 +80,12 @@ task main() {
 	motor[gun] = 0;
 
   //addToLogWithTime("Shot gun");
-/*
-  while(nMotorEncoder[motorsRight] + currentPos < inchesToEncoder(68)) {
+  resetEncoders();
+ pause(0.5);
+  	 eraseDisplay();
+ 	 	 nxtDisplayCenteredTextLine(3, "%d + %d /", nMotorEncoder[motorsRight], currentPos);
+  	nxtDisplayCenteredTextLine(4, "%d", inchesToEncoder(65));
+  while(nMotorEncoder[motorsRight] + currentPos < inchesToEncoder(60)) {
 		move(motorSpeed);
   }
   move(0);
@@ -90,9 +93,22 @@ task main() {
   //addToLogWithTime("Past baskets");
 
 	pause(0.1);
-	turnDistance(motorSpeed, 110);
-	lightsCameraAction();
+	turnDistance(motorSpeed, 45);
+	moveDistance(100, 3);
+	turnDistance(motorSpeed, 50);
 
+
+	lightsCameraAction();
+	//runLineUp();
+	moveDistance(100, 24);
+	pause(1);
+	if(robotInTheWay()) {
+		moveDistance(100, 36);
+	}
+	turnDistance(-100, 90);
+
+	moveDistance(-100, 60);
+	/*
 	if(shouldTakeSecondLine) {
 		while(LSvalNorm(RLIGHT)<lightValue){
 			move(-50);
@@ -100,9 +116,10 @@ task main() {
 		turnDistance(-50, 20);
 		moveDistance(-50, 10);
 	}
-	lineUp(false);
+	newLineUp();
 	resetEncoders();
-	int prevEncoder = 0;
+	*/
+/*	int prevEncoder = 0;
  	do {
  		prevEncoder = nMotorEncoder[motorsRight];
 		move(-50);
@@ -110,6 +127,7 @@ task main() {
 		eraseDisplay();
 		nxtDisplayTextLine(2, "%d/%d", nMotorEncoder[motorsRight], inchesToEncoder(40));
 	}	while(abs(nMotorEncoder[motorsRight])<inchesToEncoder(40) && nMotorEncoder[motorsRight]!=prevEncoder);
+	*/
 	move(0);
 
 	/*

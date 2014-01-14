@@ -9,6 +9,14 @@ const float TURN_RADIUS = 11.02; //center of robot to turning circle in inches
 const float TURN_CIRCUMFERENCE = 2.0 * TURN_RADIUS * PI; //circumference of circle robot turns in
 const float TURN_SCALAR = 1.2; //because it's not a square
 
+
+
+bool robotInTheWay(){
+	return SensorValue[sonarSensor]<30*2.54; //30 is cm distance from target
+}
+
+
+
 void initAutonomous()
 {
 	tHTIRS2DSPMode _mode = DSP_1200;

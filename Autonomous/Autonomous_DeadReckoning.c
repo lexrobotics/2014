@@ -23,7 +23,6 @@
 
 task main()
 {
-	motor[gun] = -100;
-	pause(0.1);
-	motor[gun] = 0;
+	lightsCameraAction();
+	runLineUp();
 }
