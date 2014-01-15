@@ -12,7 +12,9 @@ const float TURN_SCALAR = 1.2; //because it's not a square
 
 
 bool robotInTheWay(){
-	return SensorValue[sonarSensor]<30*2.54; //30 is cm distance from target
+	int UCANHASBOTZ = SensorValue[sonarSensor];
+	if (UCANHASBOTZ < 30 * 2.54) return true; //30 is cm distance from target
+	else return false;
 }
 
 
@@ -20,10 +22,12 @@ bool robotInTheWay(){
 void initAutonomous()
 {
 	tHTIRS2DSPMode _mode = DSP_1200;
-	/*nMotorPIDSpeedCtrl[motorsRight] = mtrSpeedReg; //enable PID on all the motors
-	  nMotorPIDSpeedCtrl[motorsLeft] = mtrSpeedReg;
-	  nMotorPIDSpeedCtrl[motorRightFront] = mtrSpeedReg;
-	  nMotorPIDSpeedCtrl[motorRightBack] = mtrSpeedReg;*/
+	/*
+	nMotorPIDSpeedCtrl[motorsRight] = mtrSpeedReg; //enable PID on all the motors
+	nMotorPIDSpeedCtrl[motorsLeft] = mtrSpeedReg;
+	nMotorPIDSpeedCtrl[motorRightFront] = mtrSpeedReg;
+	nMotorPIDSpeedCtrl[motorRightBack] = mtrSpeedReg;
+	*/
 }
 
 int inchesToEncoder(int distance) {
@@ -48,10 +52,8 @@ void moveDistance(int speed, int distance) {
 	int target = inchesToEncoder(distance);
 	resetEncoders();
 
-	move(speed); //move at desired speed
-
 	while(abs(nMotorEncoder[motorsLeft]) < abs(target)  //wait until position reached
-		&& abs(nMotorEncoder[motorsRight]) < abs(target));
+		&& abs(nMotorEncoder[motorsRight]) < abs(target)) move(speed); //move at desired speed
 
 	move(0); //stop
 }
@@ -60,10 +62,8 @@ void turnDistance(int speed, int angle) {
 	int target = degreesToEncoder(angle);
 	resetEncoders();
 
-	turn(speed); //turn at desired speed
-
 	while(abs(nMotorEncoder[motorsLeft]) < abs(target)  //wait until position reached
-		&& abs(nMotorEncoder[motorsRight]) < abs(target));
+		&& abs(nMotorEncoder[motorsRight]) < abs(target)) turn(speed); //turn at desired speed
 
 	turn(0); //stop
 }

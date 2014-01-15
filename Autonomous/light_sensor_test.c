@@ -4,12 +4,12 @@
 #include "drivers/hitechnic-sensormux.h"
 #include "drivers/lego-light.h"
 
-const tMUXSensor RLIGHT = msensor_S3_2;
-const tMUXSensor LLIGHT = msensor_S3_1;
+const tMUXSensor LLIGHT = msensor_S3_3;
+const tMUXSensor RLIGHT = msensor_S3_4;
 
 task main() {
-	LSsetActive(RLIGHT);
 	LSsetActive(LLIGHT);
+	LSsetActive(RLIGHT);
 	wait1Msec(100);
 	while(true) {
 		short leftLight = LSvalNorm(LLIGHT);

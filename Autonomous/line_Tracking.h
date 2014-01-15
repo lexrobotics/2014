@@ -1,3 +1,6 @@
+#ifndef LIGHTS_H
+#define LIGHTS_H
+
 /* Turns the wheels on only one side of the robot
  * The robot will drift toward one side
  * Defined for both sides
@@ -8,21 +11,33 @@ void driftRight(int speed);
 // Starts up light sensors
 void lightsCameraAction();
 
-// Drifts along the line
+/* Drifts along the line
+ * OLD
+*/
 void lineFollow();
 
 /* Drives forward until the line is reached
  * Input is 1 or -1 (for reverse)
+ * OLD
 */
 void findLine(int reverse);
 
 /* Aligns the robot with the line
  * Input is 1 or -1 (for reverse)
+ * OLD
 */
 void alignLine(int reverse);
 
-/* lightsCameraAction, findLine, alignLine, lineFollow
- * Defined for the second set of lines and for reverse
+/* Noah's
+ * Aligns with the line
 */
-void lineUp(bool secondLine);
-void reverseLineUp(bool secondLine);
+void newLineUp(short rightLightValue);
+
+/* Noah's
+ * lightsCameraAction()
+ * Finds the line
+ * newLineUp()
+*/
+void runLineUp();
+
+#endif

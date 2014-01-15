@@ -6,8 +6,8 @@
 const tMUXSensor LLIGHT = msensor_S3_3;
 const tMUXSensor RLIGHT = msensor_S3_4;
 
-static int lineSpeed = -30;
-static int turnSpeed = -60;
+static int lineSpeed = 30;
+static int turnSpeed = 60;
 static int lightValue = 45;
 short leftLight, rightLight, leftLightPrev, rightLightPrev;
 
@@ -22,15 +22,16 @@ void driftRight(int speed) {
 }
 
 void lightsCameraAction() {
-	LSsetActive(RLIGHT);
 	LSsetActive(LLIGHT);
+	LSsetActive(RLIGHT);
 	pause(0.2);
 }
 
 void lineFollow() {
-	int lineTarget = inchesToEncoder(60);
 	resetEncoders();
-	/*while(abs(nMotorEncoder[motorsLeft]) < abs(lineTarget)
+	/*
+	int lineTarget = inchesToEncoder(60);
+	while(abs(nMotorEncoder[motorsLeft]) < abs(lineTarget)
 		&& abs(nMotorEncoder[motorsRight]) < abs(lineTarget)) {
 		leftLight = LSvalNorm(LLIGHT);
 		leftLightPrev = leftLight;
@@ -46,15 +47,17 @@ void lineFollow() {
 			rightLightPrev = rightLight;
 			rightLight = LSvalNorm(RLIGHT);
 		}
-	}*/
-	int rightLight = LSvalNorm(RLIGHT);
-	while(rightLight < lightValue) {
-			rightLight = LSvalNorm(RLIGHT);
-			driftLeft(50);
 	}
+	*/
+	leftLight = LSvalNorm(LLIGHT);
 	while(leftLight < lightValue) {
 			leftLight = LSvalNorm(LLIGHT);
 			driftRight(50);
+	}
+	rightLight = LSvalNorm(RLIGHT);
+	while(rightLight < lightValue) {
+			rightLight = LSvalNorm(RLIGHT);
+			driftLeft(50);
 	}
 }
 
@@ -65,9 +68,9 @@ void findLine(int reverse) {
 	leftLight = LSvalNorm(LLIGHT);
 	rightLight = LSvalNorm(RLIGHT);
 	leftLightPrev = leftLight;
-	rightLightPrev = rightLight; // Checks previous light sensor values to minimize the effects of an unusual sensor reading
+	rightLightPrev = rightLight; // checks previous light sensor values to minimize the effects of an unusual sensor reading
 	while((leftLight < lightValue || leftLightPrev < lightValue) && (rightLight < lightValue || rightLightPrev < lightValue)) {
-  	if(abs(nMotorEncoder[motorsLeft]) > abs(findTarget)  // Hits wall
+  	if(abs(nMotorEncoder[motorsLeft]) > abs(findTarget)  // hits wall
 	 && abs(nMotorEncoder[motorsRight]) > abs(findTarget)) {
 			moveDistance(-1 * lineSpeed, 18);
 			turnDistance(reverse * lineSpeed, 30);
@@ -87,11 +90,11 @@ void alignLine(int reverse) {
 	int alignTarget = degreesToEncoder(360);
 	resetEncoders();
 	turn(reverse * turnSpeed);
-	pause(0.4); // Don't start checking the sensor until the robot moves off of the line.
+	pause(0.4); // don't start checking the sensor until the robot moves off of the line.
 	rightLight = LSvalNorm(RLIGHT);
 	rightLightPrev = rightLight;
 	while(rightLight < lightValue || rightLightPrev < lightValue) {
-		if(abs(nMotorEncoder[motorsLeft]) > abs(alignTarget)  // Misses line
+		if(abs(nMotorEncoder[motorsLeft]) > abs(alignTarget)  // misses line
 	 && abs(nMotorEncoder[motorsRight]) > abs(alignTarget)) {
 			findLine(reverse);
 			alignLine(reverse);
@@ -104,61 +107,48 @@ void alignLine(int reverse) {
 	pause(0.1);
 }
 
-void lineUp(bool secondLine) {
-	lightsCameraAction();
-	findLine(1);
-	alignLine(1);
-	//lineFollow();
-}
-
-void newLineUp() {
-	if(LSvalNorm(RLIGHT) > lightValue && LSvalNorm(LLIGHT) > lightValue) { //already good
-		return;
-	}
-	if(LSvalNorm(RLIGHT) > lightValue) { //right hit first
-			driftRight(50);
-			while(LSvalNorm(LLIGHT) < lightValue);
-			driftLeft(-50);
-			while(LSvalNorm(RLIGHT) < lightValue);
-			newLineUp();
-	}
-	else { //left hit first
-			driftLeft(50);
-			while(LSvalNorm(RLIGHT) < lightValue);
-			driftRight(-50);
-			while(LSvalNorm(LLIGHT) < lightValue);
-			newLineUp();
+void newLineUp(short rightLightValue) {
+	while(LSvalNorm(LLIGHT) < lightValue || LSvalNorm(RLIGHT) < lightValue) { // not aligned
+		if(rightLightValue > lightValue) { // right hit first
+			while(LSvalNorm(LLIGHT) < lightValue)
+				driftRight(turnSpeed);
+			while(LSvalNorm(RLIGHT) < lightValue)
+				driftLeft(-1 * turnSpeed);
+		}
+		else { // left hit first
+			while(LSvalNorm(RLIGHT) < lightValue)
+				driftLeft(turnSpeed);
+			while(LSvalNorm(LLIGHT) < lightValue)
+				driftRight(-1 * turnSpeed);
+		}
 	}
 }
 
 void runLineUp() {
-
-	int LEFTY = LSvalNorm(LLIGHT);
-	int RIGHTY = LSvalNorm(RLIGHT);
-	while(LEFTY < lightValue && RIGHTY < lightValue) {
-		move(20);
-		LEFTY = LSvalNorm(LLIGHT);
-		RIGHTY = LSvalNorm(RLIGHT);
+	leftLight = LSvalNorm(LLIGHT);
+	rightLight = LSvalNorm(RLIGHT);
+	leftLightPrev = leftLight;
+	rightLightPrev = rightLight;
+	while((leftLight < lightValue || leftLightPrev < lightValue) && (rightLight < lightValue || rightLightPrev < lightValue)) {
+		move(lineSpeed);
+		leftLightPrev = leftLight;
+		rightLightPrev = rightLight;
+		leftLight = LSvalNorm(LLIGHT);
+		rightLight = LSvalNorm(RLIGHT);
 	}
 	move(0);
 	pause(0.2);
-	if(LEFTY > lightValue && RIGHTY > lightValue) { //already good
+	if(leftLight > lightValue && rightLight > lightValue) { // already good
 		return;
 	}
-	if(LSvalNorm(RLIGHT) > lightValue) { //right hit first
-			newLineUp();
-			turnDistance(50, 5);
+	if(rightLight > lightValue) { // right hit first
+			newLineUp(rightLight);
+			move(0);
+			turnDistance(turnSpeed, 8);
 	}
-	else { //left hit first
-			newLineUp();
-			turnDistance(-50, 10);
+	else { // left hit first
+			newLineUp(rightLight);
+			move(0);
+			turnDistance(-1 * turnSpeed, 8);
 	}
-}
-
-
-void reverseLineUp(bool secondLine) {
-	lightsCameraAction();
-	findLine(-1);
-	alignLine(-1);
-	lineFollow();
 }
