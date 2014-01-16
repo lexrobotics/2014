@@ -162,6 +162,14 @@ task arm() {
 			motor[lift2] = -100;
 		else
 			motor[lift2] = 0;
+
+		if(joystick.joy2_TopHat = 2)//slowmo version of flag spinner with d-pad left making counterclockwise and right clockwise
+			motor[flagMotor] = 20;
+		else if(joystick.joy2_TopHat = 6)
+			motor[flagMotor] = -20;
+		else
+			motor[flagMotor] = 0;
+
 	}//while(true) arm
 }//task arm()
 
