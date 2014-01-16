@@ -50,7 +50,7 @@ task arm() {
 			servo[singleWheel]  = 240;
 		}
 		else if(joy1Btn(6)){
-			motor[dualWheels] = 45;
+			motor[dualWheels] = 50;
 			servo[singleWheel] = 10;
 		}
 		else if(joy1Btn(8)){
