@@ -66,6 +66,7 @@ task main() {
 	*/
 	move(0);
 	pause(0.1);
+
 	int currentPos = nMotorEncoder[motorsRight];
 
 	if(inchesToEncoder(35) < nMotorEncoder[motorsRight]) {
@@ -74,17 +75,14 @@ task main() {
 	else {
 		moveDistance(motorSpeedSlow, 3);
 	}
-	//pause(0.1);
-	//move(0);
+	pause(0.1);
 
 	motor[gun] = -100;
 	pause(0.1);
 	motor[gun] = 0;
 
-  //addToLogWithTime("Shot gun");
-
   resetEncoders();
- pause(0.5);
+ 	pause(0.5);
   while(nMotorEncoder[motorsRight] + currentPos < inchesToEncoder(55)) {
 		move(motorSpeed);
   }
@@ -103,7 +101,7 @@ task main() {
 	//runLineUp();
 
 	if(robotInTheWay()) {
-		moveDistance(100, 29);
+		moveDistance(100, 15);
 	}
 	turnDistance(-100, 100);
 	moveDistance(-100, 40);
