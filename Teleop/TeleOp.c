@@ -46,12 +46,12 @@ task arm() {
 		8 - turn off spit-out
 		*/
 		if(joy1Btn(1)){ //activates dualWheels and singleWheel using joy1's Right Triggers
-			motor[dualWheels] = -20; //bringing in or shooting out blocks
+			motor[dualWheels] = -40; //bringing in or shooting out blocks
 			servo[singleWheel]  = 240;
 		}
 		else if(joy1Btn(6)){
-			motor[dualWheels] = 40;
-			servo[singleWheel] = 30;
+			motor[dualWheels] = 45;
+			servo[singleWheel] = 10;
 		}
 		else if(joy1Btn(8)){
 			motor[dualWheels] = 0;
