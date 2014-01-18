@@ -32,7 +32,7 @@ task main() {
 	int initDelay = selectDelay();
 	bool shouldQueue = selectQueue();
 	bool secondLine = selectLine();
-	//waitForStart();
+	waitForStart();
 	//ClearTimer(T2);
 	//StartTask(dropHarvester);
 	pause(initDelay);

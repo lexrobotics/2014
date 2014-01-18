@@ -3,33 +3,34 @@
 #include "drivers/hitechnic-sensormux.h"
 #include "drivers/lego-light.h"
 
-const tMUXSensor RLIGHT = msensor_S3_2;
-const tMUXSensor LLIGHT = msensor_S3_1;
+const tMUXSensor LLIGHT = msensor_S3_3;
+const tMUXSensor RLIGHT = msensor_S3_4;
 
-static int lineSpeed = -30;
-static int turnSpeed = -60;
-static int lightValue = 50;
+static int lineSpeed = 30;
+static int turnSpeed = 60;
+static int lightValue = 45;
 short leftLight, rightLight, leftLightPrev, rightLightPrev;
 
 void driftLeft(int speed) {
-	motor[motorsLeft] = -50;
-	motor[motorsRight] = -10;
+	motor[motorsLeft] = 0;
+	motor[motorsRight] = speed;
 }
 
 void driftRight(int speed) {
-	motor[motorsLeft] = -10;
-	motor[motorsRight] = -50;
+	motor[motorsLeft] = speed;
+	motor[motorsRight] = 0;
 }
 
 void lightsCameraAction() {
-	LSsetActive(RLIGHT);
 	LSsetActive(LLIGHT);
+	LSsetActive(RLIGHT);
 	pause(0.2);
 }
 
 void lineFollow() {
-	int lineTarget = inchesToEncoder(60);
 	resetEncoders();
+	/*
+	int lineTarget = inchesToEncoder(60);
 	while(abs(nMotorEncoder[motorsLeft]) < abs(lineTarget)
 		&& abs(nMotorEncoder[motorsRight]) < abs(lineTarget)) {
 		leftLight = LSvalNorm(LLIGHT);
@@ -47,6 +48,17 @@ void lineFollow() {
 			rightLight = LSvalNorm(RLIGHT);
 		}
 	}
+	*/
+	leftLight = LSvalNorm(LLIGHT);
+	while(leftLight < lightValue) {
+			leftLight = LSvalNorm(LLIGHT);
+			driftRight(50);
+	}
+	rightLight = LSvalNorm(RLIGHT);
+	while(rightLight < lightValue) {
+			rightLight = LSvalNorm(RLIGHT);
+			driftLeft(50);
+	}
 }
 
 void findLine(int reverse) {
@@ -56,9 +68,9 @@ void findLine(int reverse) {
 	leftLight = LSvalNorm(LLIGHT);
 	rightLight = LSvalNorm(RLIGHT);
 	leftLightPrev = leftLight;
-	rightLightPrev = rightLight; // Checks previous light sensor values to minimize the effects of an unusual sensor reading
+	rightLightPrev = rightLight; // checks previous light sensor values to minimize the effects of an unusual sensor reading
 	while((leftLight < lightValue || leftLightPrev < lightValue) && (rightLight < lightValue || rightLightPrev < lightValue)) {
-  	if(abs(nMotorEncoder[motorsLeft]) > abs(findTarget)  // Hits wall
+  	if(abs(nMotorEncoder[motorsLeft]) > abs(findTarget)  // hits wall
 	 && abs(nMotorEncoder[motorsRight]) > abs(findTarget)) {
 			moveDistance(-1 * lineSpeed, 18);
 			turnDistance(reverse * lineSpeed, 30);
@@ -78,11 +90,11 @@ void alignLine(int reverse) {
 	int alignTarget = degreesToEncoder(360);
 	resetEncoders();
 	turn(reverse * turnSpeed);
-	pause(0.4); // Don't start checking the sensor until the robot moves off of the line.
+	pause(0.4); // don't start checking the sensor until the robot moves off of the line.
 	rightLight = LSvalNorm(RLIGHT);
 	rightLightPrev = rightLight;
 	while(rightLight < lightValue || rightLightPrev < lightValue) {
-		if(abs(nMotorEncoder[motorsLeft]) > abs(alignTarget)  // Misses line
+		if(abs(nMotorEncoder[motorsLeft]) > abs(alignTarget)  // misses line
 	 && abs(nMotorEncoder[motorsRight]) > abs(alignTarget)) {
 			findLine(reverse);
 			alignLine(reverse);
@@ -95,16 +107,48 @@ void alignLine(int reverse) {
 	pause(0.1);
 }
 
-void lineUp(bool secondLine) {
-	lightsCameraAction();
-	findLine(1);
-	alignLine(1);
-	lineFollow();
+void newLineUp(short rightLightValue) {
+	while(LSvalNorm(LLIGHT) < lightValue || LSvalNorm(RLIGHT) < lightValue) { // not aligned
+		if(rightLightValue > lightValue) { // right hit first
+			while(LSvalNorm(LLIGHT) < lightValue)
+				driftRight(turnSpeed);
+			while(LSvalNorm(RLIGHT) < lightValue)
+				driftLeft(-1 * turnSpeed);
+		}
+		else { // left hit first
+			while(LSvalNorm(RLIGHT) < lightValue)
+				driftLeft(turnSpeed);
+			while(LSvalNorm(LLIGHT) < lightValue)
+				driftRight(-1 * turnSpeed);
+		}
+	}
 }
 
-void reverseLineUp(bool secondLine) {
-	lightsCameraAction();
-	findLine(-1);
-	alignLine(-1);
-	lineFollow();
+void runLineUp() {
+	leftLight = LSvalNorm(LLIGHT);
+	rightLight = LSvalNorm(RLIGHT);
+	leftLightPrev = leftLight;
+	rightLightPrev = rightLight;
+	while((leftLight < lightValue || leftLightPrev < lightValue) && (rightLight < lightValue || rightLightPrev < lightValue)) {
+		move(lineSpeed);
+		leftLightPrev = leftLight;
+		rightLightPrev = rightLight;
+		leftLight = LSvalNorm(LLIGHT);
+		rightLight = LSvalNorm(RLIGHT);
+	}
+	move(0);
+	pause(0.2);
+	if(leftLight > lightValue && rightLight > lightValue) { // already good
+		return;
+	}
+	if(rightLight > lightValue) { // right hit first
+			newLineUp(rightLight);
+			move(0);
+			turnDistance(turnSpeed, 8);
+	}
+	else { // left hit first
+			newLineUp(rightLight);
+			move(0);
+			turnDistance(-1 * turnSpeed, 8);
+	}
 }

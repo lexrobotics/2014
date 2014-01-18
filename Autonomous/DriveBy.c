@@ -32,7 +32,7 @@ task main() {
 	int initDelay = selectDelay();
 	bool shouldQueue = selectQueue();
 	bool shouldTakeSecondLine = selectLine();
-	//waitForStart();
+	waitForStart();
 	//ClearTimer(T2);
 	//StartTask(dropHarvester);
 	pause(initDelay);
@@ -92,8 +92,8 @@ task main() {
 
 	pause(0.1);
 	turnDistance(motorSpeed, 45);
-	moveDistance(100, 5);
-	turnDistance(motorSpeed, 50);
+	moveDistance(100, 6);
+	turnDistance(motorSpeed, 65);
 	moveDistance(100, 30);
 	pause(1);
 
@@ -101,7 +101,7 @@ task main() {
 	//runLineUp();
 
 	if(robotInTheWay()) {
-		moveDistance(100, 15);
+		moveDistance(100, 12);
 	}
 	turnDistance(-100, 100);
 	moveDistance(-100, 40);
