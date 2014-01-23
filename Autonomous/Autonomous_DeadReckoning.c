@@ -19,7 +19,6 @@
 
 #include "Autonomous.c"
 #include "line_Tracking.c"
-#include "drivers/hitechnic-irseeker-v2.h"
 
 task main()
 {
@@ -29,7 +28,6 @@ task main()
 		moveDistance(100, 24);
 		runLineUp();
 	}
-	turnDistance(-100, 94);
-
-	moveDistance(-100, 60);
+	turnDistance(-100, 100);
+	moveDistance(-100, 40);
 }
