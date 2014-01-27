@@ -45,7 +45,7 @@ task main() {
 	resetEncoders();
 
 	if(shouldQueue) {
-		turnDistance(-1*motorSpeed, 45);
+		turnDistance(-1 * motorSpeed, 45);
 		moveDistance(motorSpeedSlow, 32);
 		turnDistance(motorSpeed, 48);
 		pause(1);
@@ -96,7 +96,7 @@ task main() {
 	if(robotInTheWay()) {
 		moveDistance(motorSpeed, 20);
 	}
-	turnDistance(motorSpeed, 100);
+	turnDistance(motorSpeed, 105);
 	moveDistance(motorSpeed, 50);
 	/*lightsCameraAction();
 
@@ -138,7 +138,7 @@ task main() {
 	pause(8);
 	servo[harvestLifter] = 127;
 
-	addToLogWithTime("Dropping lifter");
+	addToLogWithTime("Droppsing lifter");
 	pause(2);
 	stopLogger();
 	pause(1);
