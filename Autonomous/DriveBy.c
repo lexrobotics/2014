@@ -44,7 +44,7 @@ task main() {
 	resetEncoders();
 
 	if(shouldQueue) {
-		turnDistance(-1*motorSpeed, 32);
+		turnDistance(-1 * motorSpeed, 32);
 		moveDistance(motorSpeedSlow, 33);
 		turnDistance(motorSpeed, 51);
 	}
