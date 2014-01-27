@@ -5,18 +5,29 @@
 const float DIAMETER = 4.0; //diameter of wheel in inches
 const float ENCODER_SCALE = 1440.0; //number of encoder counts per rotation
 const float CIRCUMFERENCE = DIAMETER * PI;
-const float TURN_RADIUS = 6.0; //center of robot to turning circle in inches
+const float TURN_RADIUS = 11.02; //center of robot to turning circle in inches
 const float TURN_CIRCUMFERENCE = 2.0 * TURN_RADIUS * PI; //circumference of circle robot turns in
-const float TURN_SCALAR = 1.8; //because it's not a square
+const float TURN_SCALAR = 1.2; //because it's not a square
+
+
+
+bool robotInTheWay(){
+	int UCANHASBOTZ = SensorValue[sonarSensor];
+	if (UCANHASBOTZ < 30 * 2.54) return true; //30 is cm distance from target
+	else return false;
+}
+
+
 
 void initAutonomous()
 {
 	tHTIRS2DSPMode _mode = DSP_1200;
-	/*nMotorPIDSpeedCtrl[motorsRight] = mtrSpeedReg; //enable PID on all the motors
-	  nMotorPIDSpeedCtrl[motorsLeft] = mtrSpeedReg;
-	  nMotorPIDSpeedCtrl[motorRightFront] = mtrSpeedReg;
-	  nMotorPIDSpeedCtrl[motorRightBack] = mtrSpeedReg;*/
-	servo[harvestLifter] = 127;
+	/*
+	nMotorPIDSpeedCtrl[motorsRight] = mtrSpeedReg; //enable PID on all the motors
+	nMotorPIDSpeedCtrl[motorsLeft] = mtrSpeedReg;
+	nMotorPIDSpeedCtrl[motorRightFront] = mtrSpeedReg;
+	nMotorPIDSpeedCtrl[motorRightBack] = mtrSpeedReg;
+	*/
 }
 
 int inchesToEncoder(int distance) {
@@ -41,10 +52,8 @@ void moveDistance(int speed, int distance) {
 	int target = inchesToEncoder(distance);
 	resetEncoders();
 
-	move(speed); //move at desired speed
-
 	while(abs(nMotorEncoder[motorsLeft]) < abs(target)  //wait until position reached
-		&& abs(nMotorEncoder[motorsRight]) < abs(target));
+		&& abs(nMotorEncoder[motorsRight]) < abs(target)) move(speed); //move at desired speed
 
 	move(0); //stop
 }
@@ -53,10 +62,8 @@ void turnDistance(int speed, int angle) {
 	int target = degreesToEncoder(angle);
 	resetEncoders();
 
-	turn(speed); //turn at desired speed
-
 	while(abs(nMotorEncoder[motorsLeft]) < abs(target)  //wait until position reached
-		&& abs(nMotorEncoder[motorsRight]) < abs(target));
+		&& abs(nMotorEncoder[motorsRight]) < abs(target)) turn(speed); //turn at desired speed
 
 	turn(0); //stop
 }
@@ -147,11 +154,4 @@ int selectDelay() {
 void resetEncoders() {
 	nMotorEncoder[motorsLeft] = 0;
 	nMotorEncoder[motorsRight] = 0;
-}
-
-task dropHarvester() {
-	pause(20);
-	servo[harvestLifter] = 0;
-	pause(8.5);
-	servo[harvestLifter] = 127;
 }

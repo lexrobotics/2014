@@ -21,6 +21,10 @@
 #include "Autonomous.c"
 #include "line_Tracking.c"
 //#include "CollisionDetection.c"
+<<<<<<< HEAD
+=======
+#include "drivers/hitechnic-irseeker-v2.h"
+>>>>>>> c6485bd68941d159fc53d9115680c2e6eff93f30
 
 const int motorSpeed = -50;
 const int motorSpeedSlow = -25;
@@ -33,23 +37,21 @@ task main() {
 	//ClearTimer(T2);
 	//StartTask(dropHarvester);
 	pause(initDelay);
-	StartTask(Logger);
 
 	//addToLogWithTime("AutoStart");
 
 	int sector = 0;
 	initAutonomous();
 	resetEncoders();
-	servo[gun] = 255;
 
 	if(shouldQueue) {
-		turnDistance(motorSpeed, 45);
-		moveDistance(motorSpeedSlow, 30);
-		turnDistance(-1*motorSpeed, 55);
+		turnDistance(-1*motorSpeed, 45);
+		moveDistance(motorSpeedSlow, 32);
+		turnDistance(motorSpeed, 48);
+		pause(1);
 	}
 	resetEncoders();
-
-	bool scanning = true;
+	pause(0.1);
 	move(motorSpeedSlow);
 	while(sector!= 5 && abs(nMotorEncoder[motorsRight]) < inchesToEncoder(65)) {
 		sector = HTIRS2readACDir(HTIRS2);
@@ -65,35 +67,38 @@ task main() {
 	*/
 	move(0);
 
-  addToLogWithTime("IR Detected");
-	pause(0.1);
 	int currentPos = nMotorEncoder[motorsRight];
 
 	if(inchesToEncoder(35) < abs(nMotorEncoder[motorsRight])) {
-	  addToLog("IR second half");
-		moveDistance(motorSpeedSlow, 8);
+		//moveDistance(motorSpeedSlow, 8);
 	}
 	else {
-	  addToLog("IR first half");
-		moveDistance(motorSpeedSlow, 7);
+		moveDistance(motorSpeedSlow, 5);
 	}
 	pause(0.1);
-	move(0);
 
-	servo[gun] = 0;
+	motor[gun] = -100;
+	pause(0.1);
+	motor[gun] = 0;
+
+	resetEncoders();
 	pause(0.5);
-	servo[gun] = 255;
-  addToLogWithTime("Shot gun");
-	while(abs(nMotorEncoder[motorsRight] + currentPos) < inchesToEncoder(73)) {
+	while(abs(nMotorEncoder[motorsRight] + currentPos) < inchesToEncoder(50)) {
 		move(motorSpeed);
   }
   move(0);
-	//while(true);
-  addToLogWithTime("Past baskets");
 
 	pause(0.1);
-	turnDistance(-1 * motorSpeed, 80);
-	lightsCameraAction();
+	turnDistance(motorSpeed, 45);
+	moveDistance(motorSpeed, 5);
+	turnDistance(motorSpeed, 45);
+	moveDistance(motorSpeed, 25);
+	if(robotInTheWay()) {
+		moveDistance(motorSpeed, 20);
+	}
+	turnDistance(motorSpeed, 100);
+	moveDistance(motorSpeed, 50);
+	/*lightsCameraAction();
 
 	if(secondLine) {
 		while(LSvalNorm(RLIGHT)<lightValue){
@@ -128,7 +133,7 @@ task main() {
   move(0);
 	addToLogWithTime("On ramp");
 	*/
-
+/*
 	servo[harvestLifter] = 0;
 	pause(8);
 	servo[harvestLifter] = 127;
@@ -137,4 +142,5 @@ task main() {
 	pause(2);
 	stopLogger();
 	pause(1);
+	*/
 }
