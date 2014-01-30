@@ -1,6 +1,6 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTServo)
 #pragma config(Sensor, S2,     HTIRS2,         sensorI2CCustom)
-#pragma config(Sensor, S3,                 HTSMUX,                                 sensorI2CCustom)
+#pragma config(Sensor, S3,     gyro,           sensorAnalogInactive)
 #pragma config(Sensor, S4,     sonarSensor,    sensorSONAR)
 #pragma config(Motor,  motorA,          gun,           tmotorNXT, PIDControl, encoder)
 #pragma config(Motor,  mtr_S1_C1_1,     dualWheels,    tmotorTetrix, openLoop)
@@ -19,123 +19,111 @@
 
 #include "JoystickDriver.c"
 #include "Autonomous.c"
-#include "line_Tracking.c"
-//#include "CollisionDetection.c"
-#include "drivers/hitechnic-irseeker-v2.h"
 
-static int motorSpeed = 50;
-static int motorSpeedSlow = 25;
-static int centerDist = 40;
-static int rampDist = 80;
+const int SHORT_WAIT = 0.2;
+const int LONG_WAIT = 0.5;
 
 task main() {
-        int initDelay = selectDelay();
-        bool shouldQueue = selectQueue();
-        bool shouldTakeSecondLine = selectLine();
-        waitForStart();
-        //ClearTimer(T2);
-        //StartTask(dropHarvester);
-        pause(initDelay);
+  /*
+  int initDelay = selectDelay();
+  bool queue = selectQueue();
+  bool shouldTakeSecondLine = selectLine();
+	*/
+	initAutonomous(); //call initialization function
+	//waitForStart();	//wait for start from FCS (DNC!!)
+	//pause(initDelay);
+	bool queue = true;
+	bool reverse = true;
 
-        //addToLogWithTime("AutoStart");
+	static int MOTOR_SPEED;
+	static int MOTOR_SPEED_SLOW;
+	static int MOTOR_SPEED_MAX;
 
-        int sector = 0;
-        initAutonomous();
-        resetEncoders();
+	if(!reverse) {
+		MOTOR_SPEED = BASE_MOTOR_SPEED;
+		MOTOR_SPEED_SLOW = BASE_MOTOR_SPEED_SLOW;
+		MOTOR_SPEED_MAX = BASE_MOTOR_SPEED_MAX;
+	}
+	else {
+		MOTOR_SPEED = -1*BASE_MOTOR_SPEED;
+		MOTOR_SPEED_SLOW = -1*BASE_MOTOR_SPEED_SLOW;
+		MOTOR_SPEED_MAX = -1*BASE_MOTOR_SPEED_MAX;
+	}
 
-        if(shouldQueue) {
-                turnDistance(-1*motorSpeed, 32);
-                moveDistance(motorSpeedSlow, 33);
-                turnDistance(motorSpeed, 51);
-        }
-        resetEncoders();
+	if(queue) {
+		moveDistance(MOTOR_SPEED_SLOW, 5);
+		pause(SHORT_WAIT);
+		turnWithGyro(-1*MOTOR_SPEED, 90);
+		pause(SHORT_WAIT);
+		if(reverse){
+			moveDistance(MOTOR_SPEED_SLOW, 28);
+			pause(SHORT_WAIT);
+			turnWithGyro(MOTOR_SPEED, 42);
+		}
+		else {
+			moveDistance(MOTOR_SPEED_SLOW, 25);
+			pause(SHORT_WAIT);
+			turnWithGyro(MOTOR_SPEED, 38);
+		}
+	}
 
-        move(motorSpeedSlow);
-        while(sector!= 5 && nMotorEncoder[motorsRight] < inchesToEncoder(65)) {
-                sector = HTIRS2readACDir(HTIRS2);
-        }
-        /*
-        bool scanning = true;
-        while(scanning) {
-                sector = HTIRS2readACDir(HTIRS2);
-                if(sector==5)
-                        move(motorSpeedSlow);
-                else
-                        scanning = false;
-        }
-        */
-        move(0);
-        pause(0.1);
+	resetEncoders();
+	//move slowly until IR is detected or passed ramp
+	move(MOTOR_SPEED_SLOW);
+	while(readIRSector()!= 5 && nMotorEncoder[motorsRight] < inchesToEncoder(65))
+		;
+	move(0);
+	pause(SHORT_WAIT);
 
-        int currentPos = nMotorEncoder[motorsRight];
-
-        if(inchesToEncoder(35) < nMotorEncoder[motorsRight]) {
-                //moveDistance(motorSpeedSlow, 4);
-        }
-        else {
-                moveDistance(motorSpeedSlow, 3);
-        }
-        pause(0.1);
-
-        motor[gun] = -100;
-        pause(0.1);
-        motor[gun] = 0;
-
-  resetEncoders();
-         pause(0.5);
-  while(nMotorEncoder[motorsRight] + currentPos < inchesToEncoder(55)) {
-                move(motorSpeed);
+	//based on position, move the extra distance we need
+  int currentPos = nMotorEncoder[motorsRight];
+  if(inchesToEncoder(35) < nMotorEncoder[motorsRight]) {
+  	//beyond center
+  	if(!reverse)
+  		moveDistance(MOTOR_SPEED_SLOW, 2);
   }
+  else {
+  	//behind center
+  	moveDistance(MOTOR_SPEED_SLOW, 5);
+  }
+ 	pause(SHORT_WAIT);
+
+ 	//shoot block!
+ 	motor[gun] = -100;
+
+ 	/**************************************************************************
+ 	 *DARK MAGIC DO NOT CHANGE!!                                              *
+ 	 *WARNING - IF VALUE OF 0.1 IS CHANGED, THE PROGRAM CEASES TO WORK.       *
+ 	 *THIS VALUE USES DARK MAGIG AND IS PIVOTAL TO PROPER AUTONOMOUS FUNCTION.*
+ 	 *IF YOU CHANGE THIS VALUE, I WILL KILL YOU                               *
+ 	 *(AND YOUR FAMILY)                                                       *
+ 	 **************************************************************************/
+  pause(0.1);
+  /*
+  	DO NOT CHANGE ABOVE ARGUMENT!!
+  	MUST BE 0.1!!
+  */
+
+  motor[gun] = 0;
+
+  //drive to end of ramp
+  resetEncoders();
+  pause(LONG_WAIT);
+  move(MOTOR_SPEED);
+  while(abs(nMotorEncoder[motorsRight] + currentPos) < inchesToEncoder(60))
+  	;
   move(0);
 
-  //addToLogWithTime("Past baskets");
+  //line up with ramp
+  pause(SHORT_WAIT);
+ 	turnWithGyro(MOTOR_SPEED, 45);
+  moveDistance(MOTOR_SPEED, 8);
+  pause(SHORT_WAIT);
+  turnWithGyro(MOTOR_SPEED, 40);
+  moveDistance(MOTOR_SPEED_MAX, 30);
+  pause(SHORT_WAIT);
 
-        pause(0.1);
-        turnDistance(motorSpeed, 45);
-        moveDistance(100, 6);
-        turnDistance(motorSpeed, 65);
-        moveDistance(100, 30);
-        pause(1);
-
-        //lightsCameraAction();
-        //runLineUp();
-
-        if(robotInTheWay()) {
-                moveDistance(100, 12);
-        }
-        turnDistance(-100, 100);
-        moveDistance(-100, 40);
-        /*
-        if(shouldTakeSecondLine) {
-                while(LSvalNorm(RLIGHT)<lightValue){
-                        move(-50);
-                }
-                turnDistance(-50, 20);
-                moveDistance(-50, 10);
-        }
-        newLineUp();
-        resetEncoders();
-        */
-        /*
-        int prevEncoder = 0;
-         do {
-                 prevEncoder = nMotorEncoder[motorsRight];
-                move(-50);
-                pause(0.1);
-                eraseDisplay();
-                nxtDisplayTextLine(2, "%d/%d", nMotorEncoder[motorsRight], inchesToEncoder(40));
-        }        while(abs(nMotorEncoder[motorsRight])<inchesToEncoder(40) && nMotorEncoder[motorsRight]!=prevEncoder);
-        */
-        move(0);
-        /*
-        moveDistance(-1*motorSpeed, 40);
-        turnDistance(-1*motorSpeed, 90);
-        resetEncoders();
-        move(-100);
-        pause(0.5);
-        while(!stationary && nMotorEncoder[motorsRight]<inchesToEncoder(40))
-                move(-100);
-  move(0);
-        addToLogWithTime("On ramp");
-        */
+  //turn and park
+  turnWithGyro(-50, 90);
+  moveDistance(-100, 40);
 }
