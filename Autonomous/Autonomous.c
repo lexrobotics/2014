@@ -51,7 +51,7 @@ bool robotInTheWay() {
 		motor[motorsLeft] = MOTOR_SPEED;
 	}
 }*/
-
+//change for video
 int readIRSector() {
 	return HTIRS2readACDir(HTIRS2);
 }
