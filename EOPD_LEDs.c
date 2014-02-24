@@ -5,10 +5,10 @@
 #include "drivers/hitechnic-eopd.h"
 
 task eopd_leds() {
-  // Set B0 for output
-  HTSPBsetupIO(HTSPB, 0x1);
-HTEOPDsetLongRange(eopd);
-int val,wait;
+	// Set B0 for output
+	HTSPBsetupIO(HTSPB, 0x1);
+	HTEOPDsetLongRange(eopd);
+	int val;
 
 	while(true) {
 		nxtDisplayCenteredBigTextLine(3,"%d",val=HTEOPDreadProcessed(eopd));
@@ -17,7 +17,7 @@ int val,wait;
 			HTSPBwriteIO(HTSPB, 0x01);
 			wait10MSec(40);
 		}
-		else if(vateIO(HTSPB, 0x01);
+		else if(30){//3
 			for(int i=0;i<4;i++){
 				HTSPBwriteIO(HTSPB, 0x01);
 				wait10MSec(5);
@@ -43,7 +43,3 @@ int val,wait;
 	}
 }
 
-
-task main(){
-
-}
