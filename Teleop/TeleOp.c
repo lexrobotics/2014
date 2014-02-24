@@ -20,10 +20,10 @@
 
 #include "JoystickDriver.c" //library with joystick controls
 
-static float MOTOR_SCALE = 200.0/256.0; //since joystick values range from -128 to 127 and motors from -100 to 100, we need to scale values from the joystick
+static float MOTOR_SCALE = -1*200.0/256.0; //since joystick values range from -128 to 127 and motors from -100 to 100, we need to scale values from the joystick
 
 void initialize() {
-	servo[rampTilt] = 127;
+	servo[rampTilt] = 200;
 	servo[singleWheel] = 127;
 }
 
@@ -34,6 +34,8 @@ e.g. you can raise your arm while driving at the same time
 Although technically you could just paste it all into main() and it would still work
 */
 task arm() {
+	int tiltValue = 200;
+
 	while(true){
 		getJoystickSettings(joystick); //grab snapshot of controller positions
 
@@ -54,11 +56,11 @@ task arm() {
 		Noah: the singleWheel now spins inward on its own unless stopped
 		*/
 		if(joy1Btn(1)) { //bring in or shoot out blocks by spinning dualWheels and singleWheel together
-			motor[dualWheels] = -40;
+			motor[dualWheels] = -70;
 			servo[singleWheel] = 240;
 		}
 		else if(joy1Btn(6)) {
-			motor[dualWheels] = 50;
+			motor[dualWheels] = 80;
 			servo[singleWheel] = 10;
 		}
 		else if(joy1Btn(8)) {
@@ -66,7 +68,7 @@ task arm() {
 			servo[singleWheel] = 10;
 		}
 		else if(joy1Btn(3)) {
-			motor[dualWheels] = -40;
+			motor[dualWheels] = -70;
 			servo[singleWheel] = 10;
 		}
 		else if(joy1Btn(7))
@@ -79,26 +81,32 @@ task arm() {
 		joy1 Y button (4) press+hold raises it (ignore the 00 01 02 03 in Joystick Control)
 		joy1 A button (2) press+hold lowers it
 		*/
-		if(joy1Btn(4))
-			servo[rampTilt] = 127 + 64;
-		else if(joy1Btn(2))
-			servo[rampTilt] = 127 - 64;
-		else
-			servo[rampTilt] = 127;
-
+		if(joy1Btn(4)) {
+			tiltValue+=1;
+			if(tiltValue>210)
+				tiltValue = 220;
+			servo[rampTilt] = tiltValue;
+		}
+		else if(joy1Btn(2)) {
+			tiltValue-=1;
+			if(tiltValue<220-64)
+				tiltValue = 220-64;
+			servo[rampTilt] = tiltValue;
+		}
+		//servo[rampTilt] = rampTilt;
 		/*
 		singleWheelTilt - 180-deg servo
 		Separates the singleWheel from the ramp to dump cubes
 		joy1 tophat up (0) press+hold raises it\
 		joy1 tophat down (4) press+hold lowers it
 		*/
-		if (joystick.joy1_TopHat == 4) {
+		/*if (joystick.joy1_TopHat == 4) {
 			servo[rampTilt] = 127 + 64;
 		}
 		else if (joystick.joy1_TopHat == 0) {
 
 			servo[rampTilt] = 127 - 64;
-		}
+		}*/
 
 
 
@@ -143,9 +151,9 @@ task arm() {
 		Left lower trigger lowers
 		*/
 		if(joy2Btn(7)) //controls lift1 using joy2's left triggers
-			motor[bottomLift] = 100;
-		else if(joy2Btn(5))
 			motor[bottomLift] = -100;
+		else if(joy2Btn(5))
+			motor[bottomLift] = 100;
 		else
 			motor[bottomLift] = 0;
 

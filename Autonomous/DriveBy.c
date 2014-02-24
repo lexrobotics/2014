@@ -4,8 +4,8 @@
 #pragma config(Sensor, S3,     gyro,           sensorAnalogInactive)
 #pragma config(Sensor, S4,     sonarSensor,    sensorSONAR)
 #pragma config(Motor,  motorA,          gun,           tmotorNXT, PIDControl, encoder)
-#pragma config(Motor,  mtr_S1_C1_1,     motorsRight,   tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C1_2,     motorsLeft,    tmotorTetrix, openLoop, reversed)
+#pragma config(Motor,  mtr_S1_C1_1,     motorsRight,   tmotorTetrix, openLoop, reversed)
+#pragma config(Motor,  mtr_S1_C1_2,     motorsLeft,    tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_1,     frontLift,     tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_2,     backLift,      tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C3_1,     flagMotor,     tmotorTetrix, openLoop)
@@ -20,132 +20,43 @@
 
 #include "JoystickDriver.c"
 #include "Autonomous.c"
-
-const int SHORT_WAIT = 0.2;
-const int LONG_WAIT = 0.5;
+#include "Paths.c"
 
 task main() {
-  /*
-  int initDelay = selectDelay();
-  bool queue = selectQueue();
-  bool shouldTakeSecondLine = selectLine();
-	*/
+
+ // int initDelay = selectDelay();
+ // bool queue = selectQueue();
+ // bool shouldTakeSecondLine = selectLine();
+
 	initAutonomous(); //call initialization function
-	//waitForStart();	//wait for start from FCS (DNC!!)
+	//waitForStart();	//wait for start from FCS (DNC!)
 	//pause(initDelay);
-	bool queue = false;
-	bool reverse = true;
-	bool reverseOntoRamp = false;
+	//bool queue = false;
+	//bool reverse = true;
+	//bool reverseOntoRamp = false;
 
-	static int MOTOR_SPEED;
-	static int MOTOR_SPEED_SLOW;
-	static int MOTOR_SPEED_MAX;
-
-	if(!reverse) {
-		MOTOR_SPEED = BASE_MOTOR_SPEED;
-		MOTOR_SPEED_SLOW = BASE_MOTOR_SPEED_SLOW;
-		MOTOR_SPEED_MAX = BASE_MOTOR_SPEED_MAX;
+	/*if(queue && reverse) {
+		reverseQueue();
 	}
-	else {
-		MOTOR_SPEED = -1*BASE_MOTOR_SPEED;
-		MOTOR_SPEED_SLOW = -1*BASE_MOTOR_SPEED_SLOW;
-		MOTOR_SPEED_MAX = -1*BASE_MOTOR_SPEED_MAX;
-	}
-
-	if(queue) {
-		moveDistance(MOTOR_SPEED_SLOW, 5);
-		pause(SHORT_WAIT);
-		turnWithGyro(-1*MOTOR_SPEED, 90);
-		pause(SHORT_WAIT);
-		if(reverse){
-			moveDistance(MOTOR_SPEED_SLOW, 34);
-			pause(SHORT_WAIT);
-			turnWithGyro(MOTOR_SPEED, 42);
-			pause(SHORT_WAIT);
-			moveDistance(-1*MOTOR_SPEED, 2);
-		}
-		else {
-			moveDistance(MOTOR_SPEED_SLOW, 25);
-			pause(SHORT_WAIT);
-			turnWithGyro(MOTOR_SPEED, 38);
-		}
-	}
-
-	resetEncoders();
-	//move slowly until IR is detected or passed ramp
-	move(MOTOR_SPEED_SLOW);
-	while(readIRSector()!= 5 && nMotorEncoder[motorsRight] < inchesToEncoder(65))
-		;
-	move(0);
-	pause(SHORT_WAIT);
-
-	//based on position, move the extra distance we need
-  int currentPos = nMotorEncoder[motorsRight];
-  if(inchesToEncoder(35) < abs(nMotorEncoder[motorsRight])) {
-  	//beyond center
-  		if(!reverse)
-  		moveDistance(MOTOR_SPEED_SLOW, 2);
-  }
-  else {
-  	//behind center
-  	moveDistance(MOTOR_SPEED_SLOW, 5);
-  }
- 	pause(SHORT_WAIT);
-
- 	//shoot block!
- 	motor[gun] = -100;
-
- 	/**************************************************************************
- 	 *DARK MAGIC DO NOT CHANGE!!                                              *
- 	 *WARNING - IF VALUE OF 0.1 IS CHANGED, THE PROGRAM CEASES TO WORK.       *
- 	 *THIS VALUE USES DARK MAGIC AND IS PIVOTAL TO PROPER AUTONOMOUS FUNCTION.*
- 	 *IF YOU CHANGE THIS VALUE, I WILL KILL YOU                               *
- 	 *(AND YOUR FAMILY)                                                       *
- 	 **************************************************************************/
-  pause (0.1); //Clive, we don't appriciate confusing paranthses
-  /*
-  	DO NOT CHANGE ABOVE ARGUMENT!!
-  	MUST BE 0.1!!
-  */
-
-  motor[gun] = 0;
-
-  //drive to end of ramp
-  resetEncoders();
-  pause(LONG_WAIT);
-  if(reverseOntoRamp) {
-  	move(-1*MOTOR_SPEED);
-  	while(abs(nMotorEncoder[motorsRight] + currentPos) > inchesToEncoder(5))
-  		;
-		move(0);
-  }
-  else {
-  	move(MOTOR_SPEED);
-  	while(abs(nMotorEncoder[motorsRight] + currentPos) < inchesToEncoder(55))
-  		;
-  	move(0);
-	}
-
+	else if(queue && !reverse){
+		forwardQueue();
+	}*/
+	forwardQueue();
+	//lineUp();
+	int currentPos = driveUp();
+	endOfRamp(currentPos);
+	//reverseBeginningOfRamp(currentPos);
+	//forwardRamp();
+	forwardRamp();
+	turnAndPark();
+/*
 	if(reverseOntoRamp) {
-	  //line up with ramp
-	  pause(SHORT_WAIT);
-	 	turnWithGyro(-1*MOTOR_SPEED, 40);
-	  moveDistance(-1*MOTOR_SPEED, 12);
-	  pause(SHORT_WAIT);
-	  turnWithGyro(-1*MOTOR_SPEED, 30);
-	  moveDistance(-1*MOTOR_SPEED_MAX, 30);
+		forwardRamp();
 	}
 	else {
-		//line up with ramp
-	  pause(SHORT_WAIT);
-	 	turnWithGyro(MOTOR_SPEED, 40);
-	  moveDistance(MOTOR_SPEED, 10);
-	  pause(SHORT_WAIT);
-	  turnWithGyro(MOTOR_SPEED, 40);
-	  moveDistance(MOTOR_SPEED_MAX, 30);
+	 	reverseRamp();
 	}
-	pause(SHORT_WAIT);
-	//turn and park
-  turnWithGyro(-50, 85);
-  moveDistance(-100, 40);
+
+	turnAndPark();
+	*/
 }
