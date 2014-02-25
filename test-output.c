@@ -11,11 +11,10 @@ Read the status of a switch and display the status on an LED
 #include "drivers/hitechnic-superpro.h"
 
 task main() {
-  int input;
-
-  while(true) {
-  	input = HTSPBreadIO(HTSPB, 0x00);
-	  nxtDisplayTextLine(3, "CH0: %4d", input);
-	  wait1Msec(50);
-  }
+  // Set B0 for output
+  HTSPBsetupIO(HTSPB, 0x1);
+  HTSPBwriteIO(HTSPB, 0x01);
+	while(true) {
+		  HTSPBwriteIO(HTSPB, 0x01);
+	}
 }

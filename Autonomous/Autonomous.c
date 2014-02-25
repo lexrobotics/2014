@@ -51,13 +51,14 @@ bool robotInTheWay() {
 		motor[motorsLeft] = MOTOR_SPEED;
 	}
 }*/
-
+//another video change
 int readIRSector() {
 	return HTIRS2readACDir(HTIRS2);
 }
 void initAutonomous() {
 	tHTIRS2DSPMode _mode = DSP_1200;
 	StartTask(getHeading);
+	pause(2);
 	resetEncoders();
 }
 
@@ -101,44 +102,54 @@ void turnDistance(int speed, int angle) {
 
 // Current heading of the robot
 float currHeading = 0;
-int samples = 0;
-int finalSamples = 0;
+//int samples = 0;
+//int finalSamples = 0;
 
 // Task to keep track of the current heading using the HT Gyro
 task getHeading () {
 	float delTime = 0;
+<<<<<<< HEAD
+=======
+	//float prevHeading = 0;
+>>>>>>> 3d7027a3df86bbe6ca94720af2926d9a9bd472ee
 	float curRate = 0;
 	nSchedulePriority = kHighPriority;
   HTGYROstartCal(gyro);
+  pause(1);
   PlaySound(soundBeepBeep);
   while (true) {
-    time1[T1] = 0; //reset timer
-    curRate = HTGYROreadRot(gyro); //read gyro (rotational velocity)
-    if (abs(curRate) > 3)
-      currHeading = (currHeading + curRate*delTime + 720) % 720 - 360;
+    time1[T1] = 0;
+    curRate = HTGYROreadRot(gyro);
+    //samples ++;
+    if (abs(curRate) > 3) {
+      //prevHeading = currHeading;
+      currHeading += curRate * delTime; //Approximates the next heading by adding the rate*time.
+      if (currHeading > 360) currHeading -= 360;
+      else if (currHeading < -360) currHeading += 360;
+    }
     wait1Msec(5);
     delTime = ((float)time1[T1]) / 1000; //set delta (zero first time around)
   }
 }
 
 void turnWithGyro(int speed, float degrees) {
+	clearDebugStream();
+	currHeading = 0;
 	move(0);
 	HTGYROstartCal(gyro);
 	pause(1);
-	samples = 0;
+	//samples = 0;
 	if(speed > 0) {
-		currHeading = 0;
 		while(currHeading < degrees) {
 				turn(speed);
 		}
 	}
 	else {
-		currHeading = 359;
-		while(currHeading > 360 - degrees) {
+		while(currHeading > -1*degrees) {
 				turn(speed);
 		}
 	}
-	finalSamples = samples;
+	//finalSamples = samples;
 	move(0);
 }
 
