@@ -108,10 +108,7 @@ float currHeading = 0;
 // Task to keep track of the current heading using the HT Gyro
 task getHeading () {
 	float delTime = 0;
-<<<<<<< HEAD
-=======
 	//float prevHeading = 0;
->>>>>>> 3d7027a3df86bbe6ca94720af2926d9a9bd472ee
 	float curRate = 0;
 	nSchedulePriority = kHighPriority;
   HTGYROstartCal(gyro);
