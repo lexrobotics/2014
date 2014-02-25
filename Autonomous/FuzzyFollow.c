@@ -24,19 +24,16 @@
 float distance[] = {18.0, 18.0, 18.0, 18.0, 18.0};  // last five distances from the wall
 float deltaDistance = 0.0;                          // change in distance over time
 
-float negativeD, neutralD, positiveD;
-float negativeDD, neutralDD, positiveDD;
+float negativeD, neutralD, positiveD;       // membership grades for the three distance fuzzy input sets
+float negativeDD, neutralDD, positiveDD;    // membership grades for the three deltaDistance fuzzy input sets
 
-task getDistances()
+void getDistances()
 {
-    while (true)
-    {
-        ClearTimer(T3);
-        for (int i = 4; i > 0; i--)
-            distance[i] = distance[i - 1];
-        distance[0] = CLIVE; // unit are inches and inches per second
-        deltaDistance = (distance[0] - distance[4]) * 1000 / (time1[T3] * 5);
-    }
+    ClearTimer(T3);
+    for (int i = 4; i > 0; i--)
+        distance[i] = distance[i - 1];
+    distance[0] = CLIVE; // units: inches and inches per second
+    deltaDistance = (distance[0] - distance[4]) * 1000 / (time1[T3] * 5);
 }
 
 float bindValue(float value)
@@ -52,6 +49,8 @@ void fuzzify()
 {
     float dist = distance[0];
     float dDist = deltaDistance;
+    nxtDisplayCenteredTextLine(1, "distance: %f", dist);
+    nxtDisplayCenteredTextLine(2, "deltaDistance: %f", dDist);
     
     negativeD = (18 - dist) / 6;
     negativeD = bindValue(negativeD);
@@ -68,13 +67,37 @@ void fuzzify()
     positiveDD = bindValue(positiveDD);
 }
 
-void applySetsAndDefuzzify()
+float applySetsAndDefuzzify()
 {
-    float numerator = 0.0;
-    float denominator = 0.0;
+    float numerator = negativeD * 1.5 + neutralD + positiveD * 0.5 + negativeDD * 1.5 + neutralDD + positiveDD * 0.5;
+    float denominator = negativeD + neutralD + positiveD + negativeDD + neutralDD + positiveDD;
+    return numerator / denominator;
+}
+
+void runMotors(float turnRatio)
+{
+    int leftSpeed = (int)(turnRatio * 40 + 0.5);
+    int rightSpeed = (int)((1 - turnRatio) * 40 + 0.5);
+    nxtDisplayCenteredTextLine(4, "leftSpeed: %d", leftSpeed);
+    nxtDisplayCenteredTextLine(5, "rightSpeed: %d", rightSpeed);
+    motor[motorsLeft] = leftSpeed;
+    motor[motorsRight] = rightSpeed;
+}
+
+void fuzzyFollow()
+{
+    getDistances();
+    fuzzify();
+    float turnRatio = applySetsAndDefuzzify();
+    nxtDisplayCenteredTextLine(3, "turnRatio: %f", turnRatio);
+    runMotors(turnRatio);
 }
 
 task main()
 {
-    
+    while (distance[0] < 30)
+    {
+        fuzzyFollow();
+    }
+    move(0);
 }
