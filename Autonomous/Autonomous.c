@@ -107,24 +107,17 @@ int finalSamples = 0;
 // Task to keep track of the current heading using the HT Gyro
 task getHeading () {
 	float delTime = 0;
-	float prevHeading = 0;
 	float curRate = 0;
 	nSchedulePriority = kHighPriority;
   HTGYROstartCal(gyro);
   PlaySound(soundBeepBeep);
   while (true) {
-    time1[T1] = 0;
-    curRate = HTGYROreadRot(gyro);
-    samples ++;
-    if (abs(curRate) > 3) {
-      prevHeading = currHeading;
-      currHeading = prevHeading + curRate * delTime;
-      if (currHeading > 360) currHeading -= 360;
-      else if (currHeading < 0) currHeading += 360;
-    }
+    time1[T1] = 0; //reset timer
+    curRate = HTGYROreadRot(gyro); //read gyro (rotational velocity)
+    if (abs(curRate) > 3)
+      currHeading = (currHeading + curRate*delTime + 720) % 720 - 360;
     wait1Msec(5);
-    delTime = ((float)time1[T1]) / 1000;
-    //delTime /= 1000;
+    delTime = ((float)time1[T1]) / 1000; //set delta (zero first time around)
   }
 }
 
