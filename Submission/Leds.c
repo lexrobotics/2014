@@ -1,6 +1,6 @@
 #include "drivers/hitechnic-superpro.h"
-#include "drivers/hitechnic-eopd.h"
 #include "drivers/hitechnic-sensormux.h"
+#include "drivers/hitechnic-eopd.h"
 
 const tMUXSensor eopd = msensor_S3_2;
 
@@ -21,7 +21,7 @@ task eopd_leds() {
 
 	while(true) {
 		nxtDisplayCenteredBigTextLine(3,"%d",val=HTEOPDreadProcessed(eopd));
-		
+
 		if(val>50){ //4 blocks in tray
 			HTSPBwriteIO(HTSPB, 0x01);
 			wait10MSec(40);
@@ -54,4 +54,3 @@ task eopd_leds() {
 		}
 	}
 }
-

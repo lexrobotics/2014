@@ -1,19 +1,64 @@
-#include "Autonomous.h"
-#include "drivers/hitechnic-irseeker-v2.h"
 #include "drivers/hitechnic-gyro.h"
+#include "drivers/hitechnic-sensormux.h"
+#include "drivers/hitechnic-irseeker-v2.h"
 
-#define CLIVE SensorValue[sonarSensor] / 2.54
-// Cool
-// Legendary
-// Ingenious
-// Victorious
-// Elephant
+const tMUXSensor HTIRS2 = msensor_S2_1;
 
 //Task prototypes
 task getHeading();
 
 //Function prototypes
-//TODO
+// Sets the mode (frequency) of the infrared sensor
+void initAutonomous();
+
+// Converts inches to target value for encoder
+int inchesToEncoder(int distance);
+
+// Converts degrees to target value for encoder
+int degreesToEncoder(int angle);
+
+/* Moves robot with motor power "speed"
+ * speed > 0: forward
+ * speed < 0: backwards
+ * speed = 0: stop
+ */
+void move(int speed);
+
+/* Turns robot at the center with motor power "speed"
+ * speed > 0: clockwise
+ * speed < 0: counter-clockwise
+ * speed = 0: stop
+ */
+void turn(int speed);
+
+/* Moves robot a certain distance
+ * Works like move() function, except stops when robot reaches "distance" inches
+ */
+void moveDistance(int speed, int distance);
+
+/* Turns robot a certain angle
+ * Works like turn(), except stops when robot reaches angle degrees
+ * Degrees is always positive, speed determines direction of rotation
+ */
+ //void turnDistance(int speed, int angle);
+
+/* Turns robot a certain angle
+ * Works like turnDistance()
+ * Uses gyroscope, so much more precise!
+ */
+void turnDistance(int speed, int angle);
+
+// Wait a number of seconds
+void pause(float seconds);
+
+// Menu that displays question on screen, gets boolean answer of either two options
+bool selectBool(char* s1, char* s2, char* s3);
+
+// Menu that allows user to select an integer delay for beginning of autonomous
+int selectDelay();
+
+// Resets all encoder values to 0
+void resetEncoders();
 
 //Robot physical constants
 const float DIAMETER = 4.0; //diameter of wheel in inches
@@ -24,41 +69,22 @@ const float TURN_CIRCUMFERENCE = 2.0 * TURN_RADIUS * PI; //circumference of circ
 const float TURN_SCALAR = 1.2; //because it's not a square
 
 //Autonomous related constants
-const int BASE_MOTOR_SPEED = 50;
-const int BASE_MOTOR_SPEED_SLOW = 20;
+const int BASE_MOTOR_SPEED = 60;
+const int BASE_MOTOR_SPEED_SLOW = 30;
 const int BASE_MOTOR_SPEED_MAX = 100;
 
+/*
 bool robotInTheWay() {
 	return CLIVE < 30; //30 inches
-}
+} */
 
-/*void wallFollow(int distance) {
-	const int ERROR = 2; //error in inches/2
-	nxtDisplayCenteredTextLine(2, "%d / %d", CLIVE, distance);
-	if(CLIVE > distance + ERROR) {
-		//drift right
-		motor[motorsRight] = MOTOR_SPEED * 0.1;
-		motor[motorsLeft] = MOTOR_SPEED;
-	}
-	else if(CLIVE < distance - ERROR) {
-		//drift left
-		motor[motorsRight] = MOTOR_SPEED;
-		motor[motorsLeft] = MOTOR_SPEED * 0.1;
-	}
-	else {
-		//straight ahead
-		motor[motorsRight] = MOTOR_SPEED;
-		motor[motorsLeft] = MOTOR_SPEED;
-	}
-}*/
-//another video change
 int readIRSector() {
 	return HTIRS2readACDir(HTIRS2);
 }
 void initAutonomous() {
 	tHTIRS2DSPMode _mode = DSP_1200;
-	StartTask(getHeading);
-	pause(2);
+	//StartTask(getHeading);
+	//pause(2);
 	resetEncoders();
 }
 
@@ -102,8 +128,6 @@ void turnDistance(int speed, int angle) {
 
 // Current heading of the robot
 float currHeading = 0;
-//int samples = 0;
-//int finalSamples = 0;
 
 // Task to keep track of the current heading using the HT Gyro
 task getHeading () {
@@ -117,9 +141,7 @@ task getHeading () {
   while (true) {
     time1[T1] = 0;
     curRate = HTGYROreadRot(gyro);
-    //samples ++;
     if (abs(curRate) > 3) {
-      //prevHeading = currHeading;
       currHeading += curRate * delTime; //Approximates the next heading by adding the rate*time.
       if (currHeading > 360) currHeading -= 360;
       else if (currHeading < -360) currHeading += 360;
@@ -129,82 +151,39 @@ task getHeading () {
   }
 }
 
-void turnWithGyro(int speed, float degrees) {
-	clearDebugStream();
-	currHeading = 0;
-	move(0);
-	HTGYROstartCal(gyro);
-	pause(1);
-	//samples = 0;
-	if(speed > 0) {
-		while(currHeading < degrees) {
-				turn(speed);
-		}
-	}
-	else {
-		while(currHeading > -1*degrees) {
-				turn(speed);
-		}
-	}
-	//finalSamples = samples;
-	move(0);
+void turnWithGyro(int speed, float degrees, bool cal) {
+	float delTime = 0;
+	float curRate = 0;
+	float currHeading = 0;
+	nSchedulePriority = kHighPriority;
+	if(cal) {
+  	HTGYROstartCal(gyro);
+  	pause(1);
+  	PlaySound(soundBeepBeep);
+  }
+  turn(speed);
+  while (abs(currHeading) < degrees) {
+    time1[T1] = 0;
+    curRate = HTGYROreadRot(gyro);
+    if (abs(curRate) > 3) {
+      currHeading += curRate * delTime; //Approximates the next heading by adding the rate*time.
+      if (currHeading > 360) currHeading -= 360;
+      else if (currHeading < -360) currHeading += 360;
+    }
+    wait1Msec(5);
+    delTime = ((float)time1[T1]) / 1000; //set delta (zero first time around)
+  }
+  turn(0);
 }
+void turnWithGyro(int speed, float degrees) {
+	turnWithGyro(speed,degrees,true);
+}
+
 
 void pause(float seconds) {
-	wait1Msec(seconds * 1000);
+	wait10Msec(seconds * 100);
 }
 
-bool selectQueue() {
-	bool queue = false;
-	ClearTimer(T1);
-	while(true) {
-			nxtDisplayCenteredTextLine(1, "Select start");
-			if(queue)
-				nxtDisplayCenteredTextLine(2, "Queue");
-			else
-				nxtDisplayCenteredTextLine(2, "Align");
-
-			if (time1[T1] > 300) {
-    		if (nNxtButtonPressed == 1)       queue = !queue;
-    		else if (nNxtButtonPressed == 2)  queue = !queue;
-  			else if (nNxtButtonPressed == 3)  break;
-
-  		if (nNxtButtonPressed != -1) {
-    		// if any buttons were pressed, play sound and wait
-      	PlaySound(soundBlip);
-     	 	ClearTimer(T1);
-    	}
-    }
-	}
-	pause(0.3);
-	return queue;
-}
-
-bool selectLine() {
-	bool second = false;
-	ClearTimer(T1);
-	while(true) {
-			nxtDisplayCenteredTextLine(1, "Select end");
-			if(second)
-				nxtDisplayCenteredTextLine(2, "Second line");
-			else
-				nxtDisplayCenteredTextLine(2, "First line");
-
-			if (time1[T1] > 300) {
-    		if (nNxtButtonPressed == 1)       second = !second;
-    		else if (nNxtButtonPressed == 2)  second = !second;
-  			else if (nNxtButtonPressed == 3)  break;
-
-  		if (nNxtButtonPressed != -1) {
-    		// if any buttons were pressed, play sound and wait
-      	PlaySound(soundBlip);
-     	 	ClearTimer(T1);
-    	}
-    }
-	}
-	pause(0.3);
-	return second;
-}
 
 int selectDelay() {
 	int current = 0;
@@ -233,7 +212,42 @@ int selectDelay() {
   return delay;
 }
 
+bool selectBool(char* s1, char* s2, char* s3){
+	bool b = false;
+	ClearTimer(T1);
+	while(true) {
+			nxtDisplayCenteredTextLine(1, s1);
+			if(b)
+				nxtDisplayCenteredTextLine(2, s2);
+			else
+				nxtDisplayCenteredTextLine(2, s3);
+
+			if (time1[T1] > 300) {
+    		if (nNxtButtonPressed == 1)       b = !b;
+    		else if (nNxtButtonPressed == 2)  b = !b;
+  			else if (nNxtButtonPressed == 3)  break;
+
+  		if (nNxtButtonPressed != -1) {
+    		// if any buttons were pressed, play sound and wait
+      	PlaySound(soundBlip);
+     	 	ClearTimer(T1);
+    	}
+    }
+	}
+	pause(0.3);
+	return b;
+}
+bool selectQueue() {return selectBool("Select start","Queue","Align");}
+bool selectLine() {return selectBool("Select end","Second line","First line");}
+
 void resetEncoders() {
 	nMotorEncoder[motorsLeft] = 0;
 	nMotorEncoder[motorsRight] = 0;
+}
+
+task ejectFlag() {
+	servo[flagExtender] = 200;
+	servo[singleWheel] = 127;
+	pause(1);
+	servo[flagExtender] = 127;
 }
