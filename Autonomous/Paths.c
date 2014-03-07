@@ -55,7 +55,7 @@ void reverseQueue() {
 	pause(SHORT_WAIT);
 	moveDistance(REVERSE_MOTOR_SPEED, 34);
 	pause(SHORT_WAIT);
-	turnWithGyro(REVERSE_MOTOR_SPEED, 45);
+	turnWithGyro(REVERSE_MOTOR_SPEED, 43);
 	moveDistance(MOTOR_SPEED_SLOW, 3);
 }
 
@@ -196,11 +196,5 @@ void turnAndPark(){
 	resetEncoders();
 	pause(SHORT_WAIT);
 	turnWithGyro(REVERSE_MOTOR_SPEED, 85, false);
-	moveDistance(REVERSE_MOTOR_SPEED_MAX, 45);
+	moveDistance(REVERSE_MOTOR_SPEED_MAX, 50);
 }//end of turnAndPark
-
-task ejectFlag() {
-	servo[flagExtender] = 180;
-	wait10Msec(70);
-	servo[flagExtender] = 127;
-}
