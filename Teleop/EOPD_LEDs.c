@@ -25,7 +25,7 @@ task eopd_leds() {
 	int val;
 
 	while(true) {
-
+		val=HTEOPDreadProcessed(eopd)
 		if(val>7){ //4 blocks in tray
 			HTSPBwriteIO(HTSPB, 0x01);
 			wait10MSec(15);
