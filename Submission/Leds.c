@@ -29,7 +29,7 @@ task eopd_leds() {
 		else if(30){ //3 blocks in tray
 			for(int i=0;i<4;i++){
 				HTSPBwriteIO(HTSPB, 0x01);
-				wait10MSec(5);
+				wait10Msec(5);
 				HTSPBwriteIO(HTSPB, 0x00);
 				wait10MSec(5);
 			}
@@ -43,7 +43,7 @@ task eopd_leds() {
 			}
 		}
 		else if(val>12){ //1 block in tray
-			HTSPBwriteIO(HTSPB, 0x01)
+			HTSPBwriteIO(HTSPB, 0x01);
 			wait10MSec(20);
 			HTSPBwriteIO(HTSPB, 0x00);
 			wait10MSec(20);

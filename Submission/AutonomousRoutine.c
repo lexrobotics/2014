@@ -72,7 +72,7 @@ task main() {
 		}
 	}
 
-	if((!reverse && !reverseOntoRamp) || (reverse && queue)) {//is reverseQueue the same as queue?
+	if((!reverse && !reverseOntoRamp) || (reverse && reverseOntoRamp)) {
 		forwardRamp();
 		turnAndPark();
 	}
