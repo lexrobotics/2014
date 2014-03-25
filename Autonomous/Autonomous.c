@@ -66,7 +66,7 @@ const float ENCODER_SCALE = 1440.0; //number of encoder counts per rotation
 const float CIRCUMFERENCE = DIAMETER * PI;
 const float TURN_RADIUS = 11.02; //center of robot to turning circle in inches
 const float TURN_CIRCUMFERENCE = 2.0 * TURN_RADIUS * PI; //circumference of circle robot turns in
-const float TURN_SCALAR = 1.2; //because it's not a square
+const float TURN_SCALAR = 1.6; //because it's not a square
 
 //Autonomous related constants
 const int BASE_MOTOR_SPEED = 60;
@@ -151,17 +151,17 @@ task getHeading () {
   }
 }
 
-void turnWithGyro(int speed, float degrees, bool cal) {
+void turnWithGyro(int speed, float degrees) {
 	float delTime = 0;
 	float curRate = 0;
 	float currHeading = 0;
 	nSchedulePriority = kHighPriority;
-	if(cal) {
-  	HTGYROstartCal(gyro);
-  	pause(1);
-  	PlaySound(soundBeepBeep);
-  }
-  turn(speed);
+	move(0);
+	pause(1);
+  HTGYROstartCal(gyro);
+ 	pause(1);
+ 	PlaySound(soundBeepBeep);
+	turn(speed);
   while (abs(currHeading) < degrees) {
     time1[T1] = 0;
     curRate = HTGYROreadRot(gyro);
@@ -175,10 +175,6 @@ void turnWithGyro(int speed, float degrees, bool cal) {
   }
   turn(0);
 }
-void turnWithGyro(int speed, float degrees) {
-	turnWithGyro(speed,degrees,true);
-}
-
 
 void pause(float seconds) {
 	wait10Msec(seconds * 100);

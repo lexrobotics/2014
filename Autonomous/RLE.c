@@ -35,16 +35,19 @@ task main() {
     bool reverseOntoRamp = selectBool("Approach ramp", "Beginning", "End");
     bool reverse = selectBool("Should reverse", "Reverse", "Forwards");
     */
-    bool queue = true;
+    bool queue = false;
     bool	reverseOntoRamp = false;
-    bool	reverseStart = false;
+    bool	reverseStart = true;
 
 	initAutonomous(); //call initialization function
 	waitForStart();	//wait for start from FCS
 	pause(initDelay);
 
-	if(reverseStart) {
+	if(reverseStart && queue) {
 		reverseQueue(); // if we reverse, we queue, no reason to do anyting else
+	}
+	else if(reverseStart) {
+		reverseLineUp();
 	}
 	else if(queue){
 		forwardQueue();
