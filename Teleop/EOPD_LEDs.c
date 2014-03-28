@@ -18,22 +18,40 @@ const tMUXSensor eopd = msensor_S2_2;
  * No blocks - constant off
  */
 
+static int FIFTH_BLOCK_THRESH = 7;
+int ledMode = 0;
+
 task eopd_leds() {
 	// Set B0 for output
 	HTSPBsetupIO(HTSPB, 0x1);
+	HTSPBwriteIO(HTSPB, 0x01);
+
 	HTEOPDsetLongRange(eopd);
 	int val;
 
 	while(true) {
 		val=HTEOPDreadProcessed(eopd)
-		if(val>7){ //4 blocks in tray
-			HTSPBwriteIO(HTSPB, 0x01);
-			wait10MSec(15);
-			HTSPBwriteIO(HTSPB, 0x00);
-			wait10Msec(15);
+		if(ledMode == 0) {
+			if(val < FIFTH_BLOCK_THRESH){ //5th block
+				HTSPBwriteIO(HTSPB, 0x01);
+				wait10MSec(15);
+				HTSPBwriteIO(HTSPB, 0x00);
+				wait10Msec(15);
+			}
+			else{ //No blocks in tray
+				HTSPBwriteIO(HTSPB, 0x01);
+			}
 		}
-		else{ //No blocks in tray
-			HTSPBwriteIO(HTSPB, 0x01);
+		else {
+			if(lockState == 0) {
+
+			}
+			else if(lockState == 1) {
+
+			}
+			else {
+
+			}
 		}
 	}
 }

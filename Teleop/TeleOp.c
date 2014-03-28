@@ -187,9 +187,7 @@ task arm() {
 
 		if(joy2Btn(10)) {
 			while(joy2Btn(10));
-			lockState++;
-			if(lockState == 3)
-				lockState = 0;
+			ledMode = (ledMode == 0) ? 1 : 0;
 		}
 
 		if(lockState == 0) {
@@ -215,8 +213,6 @@ task main() {
 	/*******************BEGIN PROCESSES****************/
 	StartTask(arm); //parallel 'arm' task
 	ClearTimer(T1);
-	HTSPBsetupIO(HTSPB, 0x1);
-	HTSPBwriteIO(HTSPB, 0x01);
 	
 	//Process for driving.
 	while(true) {
