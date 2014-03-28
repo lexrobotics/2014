@@ -23,6 +23,17 @@
 #include "EOPD_LEDs.c"
 
 static float MOTOR_SCALE = 100.0/256.0; //since joystick values range from -128 to 127 and motors from -100 to 100, we need to scale values from the joystick
+static int JOY_DEAD = 10;         // joystick range in which movement is considered accidental
+static int MOTOR_MIN = 40;       // minimum drive motor power
+static float DRIVE_EXP = 1.4;    // exponent for drive power calculations  (1 = linear, 2 = squared)
+
+// "borrowed" from http://www.theonerobot.com/resources/exponential-drive-function
+int expDrive (int joyVal) {
+	int joyMax = 128 - JOY_DEAD;
+	int joySign = sgn(joyVal);
+	int joyLive = abs(joyVal) - JOY_DEAD;
+	return joySign * (MOTOR_MIN + ((100 - MOTOR_MIN) * pow(joyLive, DRIVE_EXP) / pow(joyMax, DRIVE_EXP)));
+ }
 
 void initialize() {
 	servo[rampTilt] = 90;
@@ -206,31 +217,13 @@ task main() {
 	ClearTimer(T1);
 	HTSPBsetupIO(HTSPB, 0x1);
 	HTSPBwriteIO(HTSPB, 0x01);
+	
 	//Process for driving.
 	while(true) {
 		getJoystickSettings(joystick); //grab snapshot of controller positions to 'joystick' 'object'
-		//Joysticks don't settle to zero, so each axis zeroed if within 10 of zero
-		//Copy this for each joystick x/y direction used, or drift will happen
-		int rightBaseMotorSpeed = 50;
-		int leftBaseMotorSpeed = 50;
-		if(abs(joystick.joy1_y1) < 15) {
-			joystick.joy1_y1 = 0;
-			leftBaseMotorSpeed = 0;
-		}
-		if(abs(joystick.joy1_y2) < 15) {
-			joystick.joy1_y2 = 0;
-			rightBaseMotorSpeed = 0;
-		}
 
-		writeDebugStreamLine("%d %d",joystick.joy1_y1,joystick.joy1_y2);
-
-		if(joystick.joy1_y1 < 0)
-			leftBaseMotorSpeed *= -1;
-		if(joystick.joy1_y2 < 0)
-			rightBaseMotorSpeed *= -1;
-
-		int j1 = MOTOR_SCALE * joystick.joy1_y1 + leftBaseMotorSpeed;
-		int j2 = MOTOR_SCALE * joystick.joy1_y2 + rightBaseMotorSpeed;
+		int j1 = expDrive(joystick.joy1_y1);
+		int j2 = expDrive(joystick.joy1_y2);
 
 		motor[motorsLeft] = j1; //powerLeft
 		motor[motorsRight] = j2; //powerRight
