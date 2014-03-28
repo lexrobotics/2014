@@ -22,7 +22,7 @@
 #include "drivers/hitechnic-superpro.h"
 #include "EOPD_LEDs.c"
 
-static float MOTOR_SCALE = 100.0/256.0; //since joystick values range from -128 to 127 and motors from -100 to 100, we need to scale values from the joystick
+static float MOTOR_SCALE = 200.0/256.0; //since joystick values range from -128 to 127 and motors from -100 to 100, we need to scale values from the joystick
 static int JOY_DEAD = 10;         // joystick range in which movement is considered accidental
 static int MOTOR_MIN = 40;       // minimum drive motor power
 static float DRIVE_EXP = 1.4;    // exponent for drive power calculations  (1 = linear, 2 = squared)
@@ -50,7 +50,7 @@ Although technically you could just paste it all into main() and it would still 
 */
 task arm() {
 	int tiltValue = 200;
-	int lockState = 0;
+
 	while(true){
 		getJoystickSettings(joystick); //grab snapshot of controller positions
 
@@ -133,9 +133,9 @@ task arm() {
 		joy2 A button (2) - wind up
 		joy2 Y button (4) - wind down
 		*/
-		if(joy2Btn(2))
+		if(joystick.joy2_x2 < -80)
 			motor[flagMotor] = 100;
-		else if(joy2Btn(4))
+		else if(joystick.joy2_x2 > 80)
 			motor[flagMotor] = -100;
 		else if (joystick.joy2_TopHat == 0){
 			motor[flagMotor] = 20;
@@ -152,9 +152,9 @@ task arm() {
 		joy2 X button (1) - flag raiser in
 		joy2 B button (3) - flag raiser out
 		*/
-		if(joy2Btn(1))
+		if(joystick.joy2_y2 > 80)
 			servo[flagExtender] = 255;
-		else if(joy2Btn(3))
+		else if(joystick.joy2_y2 < -80)
 			servo[flagExtender] = 0;
 		else
 			servo[flagExtender]  = 127;
@@ -190,10 +190,19 @@ task arm() {
 			ledMode = (ledMode == 0) ? 1 : 0;
 		}
 
+		if(joy2Btn(1)) {
+			lockState = 0;
+		}
+		if(joy2Btn(2)) {
+			lockState = 1;
+		}
+		if(joy2Btn(3)) {
+			lockState = 2;
+		}
 		if(lockState == 0) {
 			servo[liftLock] = 200;
 		}
-		else if(lockState == 1) {
+		else if(lockState == 2) {
 			servo[liftLock] = 255;
 		}
 		else {
@@ -213,13 +222,18 @@ task main() {
 	/*******************BEGIN PROCESSES****************/
 	StartTask(arm); //parallel 'arm' task
 	ClearTimer(T1);
-	
+
 	//Process for driving.
 	while(true) {
 		getJoystickSettings(joystick); //grab snapshot of controller positions to 'joystick' 'object'
 
-		int j1 = expDrive(joystick.joy1_y1);
-		int j2 = expDrive(joystick.joy1_y2);
+		if(abs(joystick.joy1_y1) < 10)
+			joystick.joy1_y1 = 0;
+		if(abs(joystick.joy1_y2) < 10)
+			joystick.joy1_y2 = 0;
+
+		int j1 = MOTOR_SCALE * joystick.joy1_y1;
+		int j2 = MOTOR_SCALE * joystick.joy1_y2;
 
 		motor[motorsLeft] = j1; //powerLeft
 		motor[motorsRight] = j2; //powerRight

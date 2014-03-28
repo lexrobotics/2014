@@ -1,6 +1,7 @@
 #include "drivers/hitechnic-gyro.h"
 #include "drivers/hitechnic-sensormux.h"
 #include "drivers/hitechnic-irseeker-v2.h"
+#include "drivers/hitechnic-superpro.h"
 
 const tMUXSensor HTIRS2 = msensor_S2_1;
 
@@ -81,11 +82,27 @@ bool robotInTheWay() {
 int readIRSector() {
 	return HTIRS2readACDir(HTIRS2);
 }
+
+task ohno() {
+	HTSPBsetupIO(HTSPB, 0x1);
+	HTSPBwriteIO(HTSPB, 0x01);
+
+	while(externalBatteryAvg < 0 || HTSMUXreadPowerStatus(HTSMUX)) {
+			HTSPBwriteIO(HTSPB, 0x01);
+			wait10Msec(5);
+			HTSPBwriteIO(HTSPB, 0x00);
+			wait10Msec(5);
+	}
+	StopTask(ohno);
+}
+
 void initAutonomous() {
 	tHTIRS2DSPMode _mode = DSP_1200;
 	//StartTask(getHeading);
 	//pause(2);
 	resetEncoders();
+	if(externalBatteryAvg < 0 || HTSMUXreadPowerStatus(HTSMUX))
+		StartTask(ohno);
 }
 
 int inchesToEncoder(int distance) {
