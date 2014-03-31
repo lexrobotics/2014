@@ -23,20 +23,9 @@
 #include "EOPD_LEDs.c"
 
 static float MOTOR_SCALE = 200.0/256.0; //since joystick values range from -128 to 127 and motors from -100 to 100, we need to scale values from the joystick
-static int JOY_DEAD = 10;         // joystick range in which movement is considered accidental
-static int MOTOR_MIN = 40;       // minimum drive motor power
-static float DRIVE_EXP = 1.4;    // exponent for drive power calculations  (1 = linear, 2 = squared)
-
-// "borrowed" from http://www.theonerobot.com/resources/exponential-drive-function
-int expDrive (int joyVal) {
-	int joyMax = 128 - JOY_DEAD;
-	int joySign = sgn(joyVal);
-	int joyLive = abs(joyVal) - JOY_DEAD;
-	return joySign * (MOTOR_MIN + ((100 - MOTOR_MIN) * pow(joyLive, DRIVE_EXP) / pow(joyMax, DRIVE_EXP)));
- }
 
 void initialize() {
-	servo[rampTilt] = 90;
+	servo[rampTilt] = 127;
 	servo[liftLock] = 200;
 
 	servo[singleWheel] = 127;
@@ -49,7 +38,7 @@ e.g. you can raise your arm while driving at the same time
 Although technically you could just paste it all into main() and it would still work
 */
 task arm() {
-	int tiltValue = 200;
+	int tiltValue = 127;
 
 	while(true){
 		getJoystickSettings(joystick); //grab snapshot of controller positions
@@ -98,14 +87,14 @@ task arm() {
 		*/
 		if(joy1Btn(4)) {
 			tiltValue+=1;
-			if(tiltValue>140)
-				tiltValue = 140;
+			if(tiltValue>160)
+				tiltValue = 160;
 			servo[rampTilt] = tiltValue;
 		}
 		else if(joy1Btn(2)) {
 			tiltValue-=1;
-			if(tiltValue<120-80)
-				tiltValue = 120-80;
+			if(tiltValue<90)
+				tiltValue = 90;
 			servo[rampTilt] = tiltValue;
 		}
 		//servo[rampTilt] = rampTilt;
