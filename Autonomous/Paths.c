@@ -40,12 +40,13 @@ void forwardQueue() {
 	moveDistance(MOTOR_SPEED_SLOW, 25);
 	pause(SHORT_WAIT);
 	turnWithGyro(MOTOR_SPEED, 45);
+	moveDistance(MOTOR_SPEED_SLOW, 5);
 }
 
 void reverseLineUp() {
 	moveDistance(REVERSE_MOTOR_SPEED_MAX, 1);
 	turnWithGyro(MOTOR_SPEED, 40);
-	moveDistance(MOTOR_SPEED_SLOW, 2);
+	moveDistance(MOTOR_SPEED_SLOW, 1);
 }
 
 void reverseQueue() {
@@ -77,7 +78,7 @@ int driveUp()
 
 	//move slowly until IR is detected or passed ramp
 	move(MOTOR_SPEED_SLOW);
-	while(readIRSector()!= 5 && abs(nMotorEncoder[motorsRight]) < inchesToEncoder(45))
+	while(readIRSector()!= 5 && abs(nMotorEncoder[motorsRight]) < inchesToEncoder(55))
 		;
 	move(0);
 
@@ -93,6 +94,8 @@ int driveUp()
 		//behind center
 		moveDistance(MOTOR_SPEED_SLOW, 2);
 	}
+	move(0);
+	pause(0.5);
 	shoot();
 
 	return stopPos + nMotorEncoder[motorsRight];
@@ -109,7 +112,7 @@ int reverseDriveUp() {
 	}
 	//move slowly until IR is detected or passed ramp
 	move(REVERSE_MOTOR_SPEED_SLOW);
-	while(readIRSector()!= 5 && abs(nMotorEncoder[motorsRight]) < inchesToEncoder(42)) {
+	while(readIRSector()!= 5 && abs(nMotorEncoder[motorsRight]) < inchesToEncoder(55)) {
 		//nxtDisplayCenteredTextLine(2, "%d", readIRSector());
 	}
 	move(0);
@@ -126,6 +129,8 @@ int reverseDriveUp() {
 		//behind center;
 		moveDistance(REVERSE_MOTOR_SPEED_SLOW, 6);
 	}
+	move(0);
+	pause(0.5);
 	shoot();
 	return stopPos + nMotorEncoder[motorsRight];
 }
@@ -147,7 +152,7 @@ void endOfRamp(int currentPos)
 	}
 	else {*/
 	move(MOTOR_SPEED);
-	while(abs(nMotorEncoder[motorsRight] + currentPos) < inchesToEncoder(54))
+	while(abs(nMotorEncoder[motorsRight] + currentPos) < inchesToEncoder(50))
 		;
 	move(0);
 //	}

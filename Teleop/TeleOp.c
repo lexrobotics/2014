@@ -142,9 +142,9 @@ task arm() {
 		joy2 B button (3) - flag raiser out
 		*/
 		if(joystick.joy2_y2 > 80)
-			servo[flagExtender] = 255;
-		else if(joystick.joy2_y2 < -80)
 			servo[flagExtender] = 0;
+		else if(joystick.joy2_y2 < -80)
+			servo[flagExtender] = 255;
 		else
 			servo[flagExtender]  = 127;
 
@@ -189,7 +189,7 @@ task arm() {
 			lockState = 2;
 		}
 		if(lockState == 0) {
-			servo[liftLock] = 200;
+			servo[liftLock] = 195;
 		}
 		else if(lockState == 2) {
 			servo[liftLock] = 255;
