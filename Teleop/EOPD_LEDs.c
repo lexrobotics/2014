@@ -1,8 +1,3 @@
-#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
-#pragma config(Sensor, S2,     HTIRS2,         sensorI2CCustom)
-#pragma config(Sensor, S3,     gyro,           sensorAnalogInactive)
-#pragma config(Sensor, S4,     HTSPB,          sensorI2CCustom9V)
-
 #include "drivers/hitechnic-superpro.h"
 #include "drivers/hitechnic-sensormux.h"
 #include "drivers/hitechnic-eopd.h"
@@ -31,11 +26,11 @@ task eopd_leds() {
 	int val;
 
 	while(true) {
-		val=HTEOPDreadProcessed(eopd)
+		val=HTEOPDreadProcessed(eopd);
 		if(ledMode == 0) {
 			if(val > FIFTH_BLOCK_THRESH){ //5th block
 				HTSPBwriteIO(HTSPB, 0x01);
-				wait10MSec(15);
+				wait10Msec(15);
 				HTSPBwriteIO(HTSPB, 0x00);
 				wait10Msec(15);
 			}
@@ -46,13 +41,13 @@ task eopd_leds() {
 		else {
 			if(lockState == 2) {
 				HTSPBwriteIO(HTSPB, 0x01);
-				wait10MSec(5);
+				wait10Msec(5);
 				HTSPBwriteIO(HTSPB, 0x00);
 				wait10Msec(5);
 			}
 			else if(lockState == 1) {
 				HTSPBwriteIO(HTSPB, 0x01);
-				wait10MSec(15);
+				wait10Msec(15);
 				HTSPBwriteIO(HTSPB, 0x00);
 				wait10Msec(15);
 			}
