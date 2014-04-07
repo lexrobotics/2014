@@ -19,7 +19,7 @@ void shoot()
 	motor[gun] = -100;
 
 	//DARK MAGIC do not change from 0.1. Seriously.
-	pause (0.1);
+	pause (0.2);
 
 	motor[gun] = 0;
 }//end function shoot
@@ -32,12 +32,6 @@ void lineUp() {
 	turnWithGyro(REVERSE_MOTOR_SPEED, 45);
 }
 
-// DOES NOT FUNCTION
-void reverseLineUp() {
-	//moveDistance(MOTOR_SPEED, 1);
-	turnWithGyro(REVERSE_MOTOR_SPEED, 45);
-}
-
 void forwardQueue() {
 	moveDistance(MOTOR_SPEED_SLOW, 3);
 	pause(SHORT_WAIT);
@@ -46,17 +40,24 @@ void forwardQueue() {
 	moveDistance(MOTOR_SPEED_SLOW, 25);
 	pause(SHORT_WAIT);
 	turnWithGyro(MOTOR_SPEED, 45);
+	moveDistance(MOTOR_SPEED_SLOW, 5);
+}
+
+void reverseLineUp() {
+	moveDistance(REVERSE_MOTOR_SPEED_MAX, 1);
+	turnWithGyro(MOTOR_SPEED, 40);
+	moveDistance(MOTOR_SPEED_SLOW, 1);
 }
 
 void reverseQueue() {
-	moveDistance(REVERSE_MOTOR_SPEED, 3);
+	moveDistance(REVERSE_MOTOR_SPEED_SLOW, 3);
 	pause(SHORT_WAIT);
 	turnWithGyro(MOTOR_SPEED, 90);
 	pause(SHORT_WAIT);
-	moveDistance(REVERSE_MOTOR_SPEED, 34);
+	moveDistance(REVERSE_MOTOR_SPEED, 33);
 	pause(SHORT_WAIT);
-	turnWithGyro(REVERSE_MOTOR_SPEED, 43);
-	moveDistance(MOTOR_SPEED_SLOW, 3);
+	turnWithGyro(REVERSE_MOTOR_SPEED, 45);
+	moveDistance(MOTOR_SPEED, 2);
 }
 
 /*
@@ -68,22 +69,33 @@ int driveUp()
 {
 	//drives up to basket
 	resetEncoders();
+
+	move(0);
+	int flusher;
+	for(int i=0; i<100; i++) {
+		flusher = readIRSector();
+	}
+
 	//move slowly until IR is detected or passed ramp
 	move(MOTOR_SPEED_SLOW);
-	while(readIRSector()!= 5 && nMotorEncoder[motorsRight] < inchesToEncoder(65))
+	while(readIRSector()!= 5 && abs(nMotorEncoder[motorsRight]) < inchesToEncoder(55))
 		;
 	move(0);
+
 	pause(SHORT_WAIT);
 	int stopPos = nMotorEncoder[motorsRight];
 	//based on position, move the extra distance we need
-	if(inchesToEncoder(35) < abs(nMotorEncoder[motorsRight])) {
+	resetEncoders();
+	if(inchesToEncoder(27) < abs(stopPos)) {
 		//beyond center
-		moveDistance(MOTOR_SPEED_SLOW, 2);
+	//	moveDistance(MOTOR_SPEED_SLOW, 2);
 	}
 	else {
 		//behind center
-		moveDistance(MOTOR_SPEED_SLOW, 5);
+		moveDistance(MOTOR_SPEED_SLOW, 2);
 	}
+	move(0);
+	pause(0.5);
 	shoot();
 
 	return stopPos + nMotorEncoder[motorsRight];
@@ -92,22 +104,33 @@ int driveUp()
 int reverseDriveUp() {
 	//drives up to basket
 	resetEncoders();
+
+	move(0);
+	int flusher;
+	for(int i=0; i<100; i++) {
+		flusher = readIRSector();
+	}
 	//move slowly until IR is detected or passed ramp
 	move(REVERSE_MOTOR_SPEED_SLOW);
-	while(readIRSector()!= 5 && nMotorEncoder[motorsRight] < inchesToEncoder(65))
-		;
+	while(readIRSector()!= 5 && abs(nMotorEncoder[motorsRight]) < inchesToEncoder(55)) {
+		//nxtDisplayCenteredTextLine(2, "%d", readIRSector());
+	}
 	move(0);
+
 	pause(SHORT_WAIT);
 	int stopPos = nMotorEncoder[motorsRight];
 	//based on position, move the extra distance we need
-	if(inchesToEncoder(35) < abs(nMotorEncoder[motorsRight])) {
+	resetEncoders();
+	if(inchesToEncoder(27) < abs(stopPos)) {
 		//beyond center
 		moveDistance(REVERSE_MOTOR_SPEED_SLOW, 2);
 	}
 	else {
-		//behind center
+		//behind center;
 		moveDistance(REVERSE_MOTOR_SPEED_SLOW, 6);
 	}
+	move(0);
+	pause(0.5);
 	shoot();
 	return stopPos + nMotorEncoder[motorsRight];
 }
@@ -151,11 +174,22 @@ void reverseEndOfRamp(int currentPos) {
 	}
 	else {*/
 	move(REVERSE_MOTOR_SPEED);
-	while(abs(nMotorEncoder[motorsRight] + currentPos) < inchesToEncoder(50))
+	while(abs(nMotorEncoder[motorsRight] + currentPos) < inchesToEncoder(55))
 		;
 	move(0);
 }
 
+void beginningOfRamp(int currentPos)
+{
+	resetEncoders();
+	pause(SHORT_WAIT);
+	move(-1*MOTOR_SPEED);
+	while(abs(nMotorEncoder[motorsRight] + currentPos) > inchesToEncoder(5))
+		;
+	move(0);
+}
+
+/*
 void beginningOfRamp(int currentPos) {
 	int rev=1;
 
@@ -165,7 +199,7 @@ void beginningOfRamp(int currentPos) {
 	while(rev*(nMotorEncoder[motorsRight] + currentPos) > inchesToEncoder(15))
 		;
 	move(0);
-}
+}*/
 
 void reverseBeginningOfRamp(int currentPos) {
 	int rev=-1;
@@ -178,23 +212,37 @@ void reverseBeginningOfRamp(int currentPos) {
 	move(0);
 }
 
-void ramp(int rev){
+void reverseRamp(){
 	//line up with ramp
 	resetEncoders();
 	pause(SHORT_WAIT);
-	turnWithGyro(rev*MOTOR_SPEED, 40, false);
-	moveDistance(rev*MOTOR_SPEED, 12);
+	//turnWithGyro(rev*MOTOR_SPEED, 40, false);
+	turnDistance(REVERSE_MOTOR_SPEED, 45);
+	moveDistance(REVERSE_MOTOR_SPEED, 12);
 	pause(SHORT_WAIT);
-	turnWithGyro(rev*MOTOR_SPEED, 30, false);//NOTE for original: in forwardRamp it's 40, in reverseRamp it's 30. --should not matter a whole lot--
-	moveDistance(rev*MOTOR_SPEED_MAX, 30);
+	//turnWithGyro(rev*MOTOR_SPEED, 30, false);//NOTE for original: in forwardRamp it's 40, in reverseRamp it's 30. --should not matter a whole lot--
+	turnDistance(REVERSE_MOTOR_SPEED, 40);
+	moveDistance(REVERSE_MOTOR_SPEED_MAX, 30);
 }
-void forwardRamp(){ramp(1);}
-void reverseRamp(){ramp(-1);}
+
+void forwardRamp() {
+	//line up with ramp
+	resetEncoders();
+	pause(SHORT_WAIT);
+	//turnWithGyro(rev*MOTOR_SPEED, 40, false);
+	turnDistance(MOTOR_SPEED, 45);
+	moveDistance(MOTOR_SPEED, 12);
+	pause(SHORT_WAIT);
+	//turnWithGyro(rev*MOTOR_SPEED, 30, false);//NOTE for original: in forwardRamp it's 40, in reverseRamp it's 30. --should not matter a whole lot--
+	turnDistance(MOTOR_SPEED, 40);
+	moveDistance(MOTOR_SPEED_MAX, 30);
+}
 
 void turnAndPark(){
 	//turn and park
 	resetEncoders();
 	pause(SHORT_WAIT);
-	turnWithGyro(REVERSE_MOTOR_SPEED, 85, false);
-	moveDistance(REVERSE_MOTOR_SPEED_MAX, 50);
+	//turnWithGyro(REVERSE_MOTOR_SPEED, 85, false);
+	turnDistance(REVERSE_MOTOR_SPEED, 80);
+	moveDistance(REVERSE_MOTOR_SPEED_MAX, 45);
 }//end of turnAndPark

@@ -20,7 +20,7 @@
 task main()
 {
 	motor[gun] = -100;
-	wait10Msec(10);
+	wait10Msec(20);
 	motor[gun] = 100;
 
 

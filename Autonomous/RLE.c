@@ -1,7 +1,7 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTServo)
-#pragma config(Sensor, S2,     HTSMUX,               sensorI2CMuxController)
-#pragma config(Sensor, S3,     ,           sensorAnalogInactive)
-#pragma config(Sensor, S4,     sonarSensor,    sensorSONAR)
+#pragma config(Sensor, S2,     HTSMUX,         sensorI2CCustom)
+#pragma config(Sensor, S3,     gyro,           sensorI2CCustom)
+#pragma config(Sensor, S4,     HTSPB,          sensorI2CCustom9V)
 #pragma config(Motor,  motorA,          gun,           tmotorNXT, PIDControl, encoder)
 #pragma config(Motor,  mtr_S1_C1_1,     motorsRight,   tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C1_2,     motorsLeft,    tmotorTetrix, openLoop)
@@ -19,6 +19,7 @@
 
 #include "Autonomous.c"
 #include "Paths.c"
+#include "JoystickDriver.c"
 
 /* AutonomousRoutine.c
    Final layer of abstraction
@@ -29,33 +30,37 @@
 task main() {
 
     int initDelay = selectDelay();
-    bool queue = selectBoolean("Should queue", "Queue", "Align");
-    bool reverseOntoRamp = selectBoolean("Approach ramp", "Beginning", "End");
-    bool reverse = selectBoolean("Should reverse", "Reverse", "Forwards");
+    /*
+    bool queue = selectBool("Should queue", "Queue", "Align");
+    bool reverseOntoRamp = selectBool("Approach ramp", "Beginning", "End");
+    bool reverse = selectBool("Should reverse", "Reverse", "Forwards");
+    */
+    bool queue = false;
+    bool	reverseOntoRamp = false;
+    bool	reverseStart = true;
 
 	initAutonomous(); //call initialization function
 	waitForStart();	//wait for start from FCS
 	pause(initDelay);
 
-	if(reverse) {
+	if(reverseStart && queue) {
 		reverseQueue(); // if we reverse, we queue, no reason to do anyting else
 	}
-	else if(queue && !reverse){
+	else if(reverseStart) {
+		reverseLineUp();
+	}
+	else if(queue){
 		forwardQueue();
 	}
 	else {
 		lineUp();
 	}
 
-	int currentPos = 0;
-	if(!reverse) {
-		currentPos = driveUp();
-	}
-	else {
-		currentPos = reverseDriveUp();
-	}
+	StartTask(ejectFlag);
 
-	if(!reverse) {
+	int currentPos = 0;
+	if(!reverseStart) {
+		currentPos = driveUp();
 		if(!reverseOntoRamp) {
 			endOfRamp(currentPos);
 		}
@@ -64,6 +69,7 @@ task main() {
 		}
 	}
 	else {
+		currentPos = reverseDriveUp();
 		if(!reverseOntoRamp) {
 			reverseEndOfRamp(currentPos);
 		}
@@ -72,12 +78,12 @@ task main() {
 		}
 	}
 
-	if((!reverse && !reverseOntoRamp) || (reverse && reverseOntoRamp)) {
+	if(reverseStart==reverseOntoRamp) {//on the same side of the ramp
 		forwardRamp();
 		turnAndPark();
 	}
 	else {
 		reverseRamp();
-		reverseTurnAndPark();
+		turnAndPark();
 	}
 }
