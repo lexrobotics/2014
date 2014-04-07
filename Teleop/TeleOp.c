@@ -149,7 +149,7 @@ task arm() {
 			servo[flagExtender]  = 127;
 
 		/*
-		backLift - motor
+		bottomLift - motor
 		Lifts the ramp level
 		Left upper trigger raises
 		Left lower trigger lowers
