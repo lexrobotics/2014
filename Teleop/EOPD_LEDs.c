@@ -24,7 +24,7 @@ task eopd_leds() {
 
 	HTEOPDsetLongRange(eopd);
 	int val;
-
+	bool lit = false;
 	while(true) {
 		val=HTEOPDreadProcessed(eopd);
 		if(ledMode == 0) {
@@ -33,9 +33,12 @@ task eopd_leds() {
 				wait10Msec(15);
 				HTSPBwriteIO(HTSPB, 0x00);
 				wait10Msec(15);
+				lit = false;
 			}
 			else{ //No blocks in tray
-				HTSPBwriteIO(HTSPB, 0x01);
+				if(!lit)
+					HTSPBwriteIO(HTSPB, 0x01);
+				lit = true;
 			}
 		}
 		else {

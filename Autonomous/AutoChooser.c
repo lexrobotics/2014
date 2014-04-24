@@ -28,36 +28,73 @@
 */
 
 task main() {
-
-    int initDelay = selectDelay();
     /*
     bool queue = selectBool("Should queue", "Queue", "Align");
     bool reverseOntoRamp = selectBool("Approach ramp", "Beginning", "End");
     bool reverse = selectBool("Should reverse", "Reverse", "Forwards");
     */
 
-    int path = selectPath([
-    	"FLE",
-    	"FLC",
-    	"FQE",
-    	"FQC",
-    	"RLE",
-    	"RLC",
-    	"RQE",
-    	"RQC"], 8);
-    bool queue = false;
-    bool	reverseOntoRamp = false;
-    bool	reverseStart = false;
+  bool queue;
+  bool reverseOntoRamp;
+  bool reverseStart;
+
+	int path = selectPath();
+
+	if(PATHS[path] == "FLE") {
+		queue = false;
+		reverseOntoRamp = false;
+		reverseStart = false;
+	}
+	else if(PATHS[path] == "FLC") {
+		queue = false;
+		reverseOntoRamp = true;
+		reverseStart = false;
+	}
+	else if(PATHS[path] == "FQE") {
+		queue = true;
+		reverseOntoRamp = false;
+		reverseStart = false;
+	}
+	else if(PATHS[path] == "FQC") {
+		queue = true;
+		reverseOntoRamp = true;
+		reverseStart = false;
+	}
+	else if(PATHS[path] == "RLE") {
+		queue = false;
+		reverseOntoRamp = false;
+		reverseStart = true;
+	}
+	else if(PATHS[path] == "RLC") {
+		queue = false;
+		reverseOntoRamp = true;
+		reverseStart = true;
+	}
+	else if(PATHS[path] == "RQE") {
+		queue = true;
+		reverseOntoRamp = false;
+		reverseStart = true;
+	}
+	else if(PATHS[path] == "RQC") {
+		queue = true;
+		reverseOntoRamp = true;
+		reverseStart = true;
+	}
+	int initDelay = selectDelay();
+	nxtDisplayCenteredTextLine(2, "%s, %d sec", PATHS[path], initDelay);
 
 	initAutonomous(); //call initialization function
 	waitForStart();	//wait for start from FCS
 	pause(initDelay);
 
-	if(reverseStart) {
+	if(reverseStart && queue) {
 		reverseQueue(); // if we reverse, we queue, no reason to do anyting else
 	}
-	else if(queue){
+	else if(!reverseStart && queue){
 		forwardQueue();
+	}
+	else if(reverseStart && !queue) {
+		reverseLineUp();
 	}
 	else {
 		lineUp();

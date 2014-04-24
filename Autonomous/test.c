@@ -21,29 +21,7 @@
 
 task main()
 {
-/*	while(true) {
-		turnWithGyro(100, 90);
-		pause(0.2);
-		moveDistance(100, 50);
-		pause(0.2);
-	}*/
-	float delTime = 0;
-	//float prevHeading = 0;
-	float curRate = 0;
-	nSchedulePriority = kHighPriority;
-  HTGYROstartCal(gyro);
-  pause(1);
-  PlaySound(soundBeepBeep);
-  while (true) {
-    time1[T1] = 0;
-    curRate = HTGYROreadRot(gyro);
-    if (abs(curRate) > 3) {
-      currHeading += curRate * delTime; //Approximates the next heading by adding the rate*time.
-      if (currHeading > 360) currHeading -= 360;
-      else if (currHeading < -360) currHeading += 360;
-    }
-    nxtDisplayCenteredTextLine(2, "%f", currHeading);
-    wait1Msec(5);
-    delTime = ((float)time1[T1]) / 1000; //set delta (zero first time around)
-  }
+		moveDistance(100,20);
+		pause(0.1);
+		moveDistance(-100,18);
 }

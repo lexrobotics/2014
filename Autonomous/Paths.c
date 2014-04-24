@@ -28,24 +28,24 @@ void shoot()
 	 Stop: A little bit ahead of driveUp start point, lined up with lower goal tape
 */
 void lineUp() {
-	moveDistance(MOTOR_SPEED, 7);
-	turnWithGyro(REVERSE_MOTOR_SPEED, 45);
+	moveDistance(MOTOR_SPEED, 8);
+	turnWithGyro(REVERSE_MOTOR_SPEED, 43);
 }
 
 void forwardQueue() {
-	moveDistance(MOTOR_SPEED_SLOW, 3);
+	moveDistance(MOTOR_SPEED, 4);
 	pause(SHORT_WAIT);
 	turnWithGyro(-1*MOTOR_SPEED, 90);
 	pause(SHORT_WAIT);
-	moveDistance(MOTOR_SPEED_SLOW, 25);
+	moveDistance(MOTOR_SPEED_SLOW, 27);
 	pause(SHORT_WAIT);
 	turnWithGyro(MOTOR_SPEED, 45);
-	moveDistance(MOTOR_SPEED_SLOW, 5);
+	moveDistance(MOTOR_SPEED_SLOW, 9);
 }
 
 void reverseLineUp() {
-	moveDistance(REVERSE_MOTOR_SPEED_MAX, 1);
-	turnWithGyro(MOTOR_SPEED, 40);
+	moveDistance(REVERSE_MOTOR_SPEED_SLOW, 1);
+	turnWithGyro(MOTOR_SPEED, 44);
 	moveDistance(MOTOR_SPEED_SLOW, 1);
 }
 
@@ -54,10 +54,10 @@ void reverseQueue() {
 	pause(SHORT_WAIT);
 	turnWithGyro(MOTOR_SPEED, 90);
 	pause(SHORT_WAIT);
-	moveDistance(REVERSE_MOTOR_SPEED, 33);
+	moveDistance(REVERSE_MOTOR_SPEED_SLOW, 35);
 	pause(SHORT_WAIT);
-	turnWithGyro(REVERSE_MOTOR_SPEED, 45);
-	moveDistance(MOTOR_SPEED, 2);
+	turnWithGyro(REVERSE_MOTOR_SPEED, 40);
+	moveDistance(MOTOR_SPEED, 1);
 }
 
 /*
@@ -141,6 +141,7 @@ int reverseDriveUp() {
 */
 void endOfRamp(int currentPos)
 {
+	moveDistance(MOTOR_SPEED, 1);
 	//drive to end of ramp
 	resetEncoders();
 	pause(SHORT_WAIT);

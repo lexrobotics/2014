@@ -67,13 +67,14 @@ const float ENCODER_SCALE = 1440.0; //number of encoder counts per rotation
 const float CIRCUMFERENCE = DIAMETER * PI;
 const float TURN_RADIUS = 11.02; //center of robot to turning circle in inches
 const float TURN_CIRCUMFERENCE = 2.0 * TURN_RADIUS * PI; //circumference of circle robot turns in
-const float TURN_SCALAR = 1.6; //because it's not a square
+const float TURN_SCALAR = 1.3; //because it's not a square
 
 //Autonomous related constants
 const int BASE_MOTOR_SPEED = 60;
 const int BASE_MOTOR_SPEED_SLOW = 30;
 const int BASE_MOTOR_SPEED_MAX = 100;
 
+const string PATHS[8] = {"FLE", "FLC", "FQE", "FQC", "RLE", "RLC", "RQE", "RQC"};
 /*
 bool robotInTheWay() {
 	return CLIVE < 30; //30 inches
@@ -197,7 +198,6 @@ void pause(float seconds) {
 	wait10Msec(seconds * 100);
 }
 
-
 int selectDelay() {
 	int current = 0;
   ClearTimer(T1);
@@ -252,6 +252,31 @@ bool selectBool(char* s1, char* s2, char* s3){
 }
 bool selectQueue() {return selectBool("Select start","Queue","Align");}
 bool selectLine() {return selectBool("Select end","Second line","First line");}
+
+int selectPath() {
+	int max = 7;
+	int index = 0;
+	ClearTimer(T1);
+	while(true) {
+		  if(index < 0)
+    		index = max;
+    	else if(index > max)
+    		index = 0;
+			nxtDisplayCenteredTextLine(1, "Choose Path");
+			nxtDisplayCenteredTextLine(2, PATHS[index]);
+
+			if (time1[T1] > 300) {
+    		if (nNxtButtonPressed == 1)       index++;
+    		else if (nNxtButtonPressed == 2)  index--;
+  			else if (nNxtButtonPressed == 3)  return index;
+  		if (nNxtButtonPressed != -1) {
+    		// if any buttons were pressed, play sound and wait
+      	PlaySound(soundBlip);
+     	 	ClearTimer(T1);
+    	}
+    }
+  }
+}
 
 void resetEncoders() {
 	nMotorEncoder[motorsLeft] = 0;
