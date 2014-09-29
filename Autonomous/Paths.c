@@ -33,13 +33,13 @@ void lineUp() {
 }
 
 void forwardQueue() {
-	moveDistance(MOTOR_SPEED, 4);
+	moveDistance(MOTOR_SPEED, 5);
 	pause(SHORT_WAIT);
-	turnWithGyro(-1*MOTOR_SPEED, 90);
+	turnWithGyro(-1*MOTOR_SPEED, 85);
 	pause(SHORT_WAIT);
 	moveDistance(MOTOR_SPEED_SLOW, 27);
 	pause(SHORT_WAIT);
-	turnWithGyro(MOTOR_SPEED, 45);
+	turnWithGyro(MOTOR_SPEED, 40);
 	moveDistance(MOTOR_SPEED_SLOW, 9);
 }
 

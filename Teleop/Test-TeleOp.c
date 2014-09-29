@@ -25,14 +25,14 @@ task main()
 
 	while(true){
 		if(abs(joystick.joy1_y1) > 10){
-			motor[motorLeft] = joystick.joy1_y1*MOTOR_SCALE;
+			motor[motorLeft] = -1 * joystick.joy1_y1*MOTOR_SCALE;
 		}
 		else
 		{
 			motor[motorLeft] = 0;
 		}
 	if(abs(joystick.joy1_y2) > 10){
-			motor[motorRight] = joystick.joy1_y2*MOTOR_SCALE;
+			motor[motorRight] = -1 * joystick.joy1_y2*MOTOR_SCALE;
 		}
 		else
 		{

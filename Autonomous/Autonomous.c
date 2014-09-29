@@ -1,7 +1,8 @@
-#include "drivers/hitechnic-gyro.h"
+
 #include "drivers/hitechnic-sensormux.h"
 #include "drivers/hitechnic-irseeker-v2.h"
 #include "drivers/hitechnic-superpro.h"
+#include "drivers/hitechnic-gyro.h"
 
 const tMUXSensor HTIRS2 = msensor_S2_1;
 

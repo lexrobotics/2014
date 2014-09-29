@@ -39,8 +39,8 @@ task main()
     curRate = HTGYROreadRot(gyro);
     if (abs(curRate) > 3) {
       currHeading += curRate * delTime; //Approximates the next heading by adding the rate*time.
-      if (currHeading > 360) currHeading -= 360;
-      else if (currHeading < -360) currHeading += 360;
+      //if (currHeading > 360) currHeading -= 360;
+      //else if (currHeading < -360) currHeading += 360;
     }
     nxtDisplayCenteredTextLine(2, "%f", currHeading);
     wait1Msec(5);

@@ -1,6 +1,5 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTServo)
-#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
-#pragma config(Sensor, S2,     HTIRS2,         sensorI2CCustom)
+#pragma config(Sensor, S2,     HTIRS2,  sensorI2CCustom)
 #pragma config(Sensor, S3,     gyro,           sensorAnalogInactive)
 #pragma config(Sensor, S4,     HTSPB,          sensorI2CCustom9V)
 #pragma config(Motor,  motorA,          gun,           tmotorNXT, PIDControl, encoder)
@@ -8,8 +7,8 @@
 #pragma config(Motor,  mtr_S1_C1_2,     motorsLeft,    tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_1,     bottomLift,    tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_2,     topLift,       tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C3_1,     dualWheels,    tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C3_2,     none,          tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C3_1,     flagMotor,     tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C3_2,     dualWheels,    tmotorTetrix, openLoop)
 #pragma config(Servo,  srvo_S1_C4_1,    singleWheel,          tServoContinuousRotation)
 #pragma config(Servo,  srvo_S1_C4_2,    rampTilt,             tServoStandard)
 #pragma config(Servo,  srvo_S1_C4_3,    liftLock,             tServoStandard)
@@ -20,11 +19,14 @@
 
 #include "JoystickDriver.c" //library with joystick controls
 #include "drivers/hitechnic-superpro.h"
-#include "EOPD_LEDs.c"
+//#include "EOPD_LEDs.c"
 
 static float MOTOR_SCALE = 100.0/256.0; //since joystick values range from -128 to 127 and motors from -100 to 100, we need to scale values from the joystick
+bool safety = false;
 
 void initialize() {
+		HTSPBsetupIO(HTSPB, 0x1);
+	HTSPBwriteIO(HTSPB, 0x01);
 	servo[rampTilt] = 150;
 	servo[liftLock] = 200;
 
@@ -38,7 +40,7 @@ e.g. you can raise your arm while driving at the same time
 Although technically you could just paste it all into main() and it would still work
 */
 task arm() {
-	int tiltValue = 150;
+	int tiltValue = 127;
 
 	while(true){
 		getJoystickSettings(joystick); //grab snapshot of controller positions
@@ -85,16 +87,28 @@ task arm() {
 		joy1 Y button (4) press+hold raises it (ignore the 00 01 02 03 in Joystick Control)
 		joy1 A button (2) press+hold lowers it
 		*/
-		if(joy1Btn(4)) {
+		if(joy2Btn(4)) {
 			tiltValue+=1;
 			if(tiltValue>190)
 				tiltValue = 190;
 			servo[rampTilt] = tiltValue;
 		}
-		else if(joy1Btn(2)) {
+		else if(joy2Btn(2)) {
 			tiltValue-=1;
 			if(tiltValue<120)
 				tiltValue = 120;
+			servo[rampTilt] = tiltValue;
+		}
+		else if(joy1Btn(4)) {
+			tiltValue+=1;
+			if(tiltValue>160)
+				tiltValue = 160;
+			servo[rampTilt] = tiltValue;
+		}
+		else if(joy1Btn(2)) {
+			tiltValue-=1;
+			if(tiltValue<90)
+				tiltValue = 90;
 			servo[rampTilt] = tiltValue;
 		}
 		//servo[rampTilt] = rampTilt;
@@ -115,39 +129,6 @@ task arm() {
 
 
 		/******JOYSTICK 2*******/
-
-		/*
-		flagMotor - motor
-		Spin dat flag using joy2's buttons 2 and 4
-		joy2 A button (2) - wind up
-		joy2 Y button (4) - wind down
-		*/
-	/*	if(joystick.joy2_x2 < -80)
-			motor[flagMotor] = 100;
-		else if(joystick.joy2_x2 > 80)
-			motor[flagMotor] = -100;
-		else if (joystick.joy2_TopHat == 0){
-			motor[flagMotor] = 20;
-		}
-		else if (joystick.joy2_TopHat == 4){
-			motor[flagMotor] = -20;
-		}
-		else
-			motor[flagMotor] = 0;
-		*/
-		/*
-		flagExtender - continuous servo
-		Move dat flag raiser using joy2's buttons 1 and 3
-		joy2 X button (1) - flag raiser in
-		joy2 B button (3) - flag raiser out
-		*/
-		if(joystick.joy2_y2 > 80)
-			servo[flagExtender] = 0;
-		else if(joystick.joy2_y2 < -80)
-			servo[flagExtender] = 255;
-		else
-			servo[flagExtender]  = 127;
-
 		/*
 		bottomLift - motor
 		Lifts the ramp level
@@ -183,9 +164,9 @@ task arm() {
 
 		if(joy2Btn(10)) {
 			while(joy2Btn(10));
-			ledMode = (ledMode == 0) ? 1 : 0;
+			//ledMode = (ledMode == 0) ? 1 : 0;
 		}
-		if(joy2Btn(1)) {
+	/*	if(joy2Btn(1)) {
 			lockState = 0;
 		}
 		if(joy2Btn(2)) {
@@ -193,8 +174,8 @@ task arm() {
 		}
 		if(joy2Btn(3)) {
 			lockState = 2;
-		}
-		if(lockState == 0) {
+		}*/
+	/*	if(lockState == 0) {
 			servo[liftLock] = 195;
 		}
 		else if(lockState == 2) {
@@ -202,7 +183,7 @@ task arm() {
 		}
 		else {
 			servo[liftLock] = 220;
-		}
+		}*/
 
 	} //while(true) arm
 } //task arm()
@@ -211,7 +192,7 @@ task main() {
 	/****************INITIALIZE TeleOp*****************/
 	//Initialize robot actuators
 	initialize();
-	StartTask(eopd_leds);
+//	StartTask(eopd_leds);
 	//Wait until receive relevant signal for start of tele-op phase
 	waitForStart();
 	/*******************BEGIN PROCESSES****************/
@@ -226,9 +207,21 @@ task main() {
 			joystick.joy1_y1 = 0;
 		if(abs(joystick.joy1_y2) < 10)
 			joystick.joy1_y2 = 0;
+		if(abs(joystick.joy2_y1) < 10)
+			joystick.joy2_y1 = 0;
+		if(abs(joystick.joy2_y2) < 10)
+			joystick.joy2_y2 = 0;
 
-		int j1 = MOTOR_SCALE * joystick.joy1_y1;
-		int j2 = MOTOR_SCALE * joystick.joy1_y2;
+		int j1, j2 = 0;
+		if(joy2Btn(3)) {
+			j1 = MOTOR_SCALE * joystick.joy1_y1;
+			j2 = MOTOR_SCALE * joystick.joy1_y2;
+		}
+		else {
+			j1 = MOTOR_SCALE * joystick.joy2_y1;
+			j2 = MOTOR_SCALE * joystick.joy2_y2;
+			motor[dualWheels] = 0;
+		}
 
 		motor[motorsLeft] = j1; //powerLeft
 		motor[motorsRight] = j2; //powerRight
